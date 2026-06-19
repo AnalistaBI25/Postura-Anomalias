@@ -1,0 +1,85 @@
+project:
+  name: proyecto_bi_anomalias_demo
+  center_id: "0000"
+  farm_name: "GRANJA DEMO"
+  timezone: "UTC"
+  analysis_start: "2024-01-01"
+  analysis_end: null
+  initial_age_week: 16
+  initial_age_day: 0
+
+paths:
+  kardex_excel: data/raw/kardex_mb51_demo.xlsx
+  kardex_cache_csv: data/cache/kardex_mb51_demo.csv
+  standard_excel: data/raw/standard_demo.xlsx
+  organization_excel: data/raw/organizacion_demo.xlsx
+  mb5b_excel: data/raw/stock_inicial_demo.xlsx
+  interim_dir: data/interim
+  processed_dir: data/processed
+  figures_dir: reports/figures
+  tables_dir: reports/tables
+  models_dir: models
+  logs_dir: logs
+
+sap:
+  bird_material: "BIRD_DEMO"
+  feed_warehouse: "WH_FEED"
+  production_warehouse: "WH_PROD"
+  houses: ["HOUSE_001", "HOUSE_002"]
+  feed_materials:
+    "FEED_001": "Fase 1 demo"
+    "FEED_002": "Fase 2 demo"
+    "FEED_003": "Fase 3 demo"
+    "FEED_004": "Fase 4 demo"
+    "FEED_005": "Fase 5 demo"
+  production_materials:
+    "EGG_001": "Producto principal demo"
+    "EGG_002": "Producto alterno demo"
+    "SUB_001": "Subproducto demo 1"
+    "SUB_002": "Subproducto demo 2"
+    "SUB_003": "Subproducto demo 3"
+  normal_egg_materials: ["EGG_001", "EGG_002"]
+  subproduct_materials: ["SUB_001", "SUB_002", "SUB_003"]
+
+stock:
+  initial_stock_date: "2024-01-01"
+  initial_stock_source: "demo/manual"
+  initial_stock_kg:
+    "FEED_001": 0.0
+    "FEED_002": 0.0
+    "FEED_003": 0.0
+    "FEED_004": 0.0
+    "FEED_005": 0.0
+
+anomaly_detection:
+  minimum_history_days: 14
+  rolling_window_days: 28
+  robust_z_threshold: 3.5
+  policy_gap_warning_pct: 0.15
+  policy_gap_critical_pct: 0.30
+  daily_change_warning_pct: 0.35
+  zero_consumption_with_birds_days: 1
+  isolation_forest:
+    enabled: true
+    contamination: 0.035
+    random_state: 42
+    n_estimators: 400
+  scoring:
+    rule_weight: 0.65
+    ml_weight: 0.35
+    medium_threshold: 40
+    high_threshold: 60
+    critical_threshold: 80
+
+outputs:
+  save_csv: true
+  build_dashboard: true
+  generate_figures: true
+  train_ml_baseline: true
+
+reference_validation:
+  expected_cycles: null
+  expected_houses: []
+  reference_stock_date: null
+  expected_feed_entry_kg: null
+  expected_stock_global_kg: null

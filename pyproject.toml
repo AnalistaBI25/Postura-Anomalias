@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "granjas-anomalias"
+version = "0.1.0"
+description = "Proyecto BI/Data Science reproducible para reconstrucción SAP y detección de anomalías en consumo de alimento avícola"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Jesús Javier Can Noh"}]
+dependencies = [
+  "pandas>=2.1,<3.0",
+  "numpy>=1.26,<3.0",
+  "openpyxl>=3.1,<4.0",
+  "PyYAML>=6.0,<7.0",
+  "scikit-learn>=1.4,<2.0",
+  "joblib>=1.3,<2.0",
+  "matplotlib>=3.8,<4.0",
+  "plotly>=5.20,<7.0",
+  "jinja2>=3.1,<4.0",
+  "nbformat>=5.9,<6.0",
+  "pytest>=8.4.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "ruff>=0.5,<1.0"]
+
+[project.scripts]
+granjas-anomalias = "granjas_anomalias.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+granjas_anomalias = ["templates/*.html"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

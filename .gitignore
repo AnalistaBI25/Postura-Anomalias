@@ -1,0 +1,101 @@
+# Local environments and editor state
+.venv/
+venv/
+env/
+.vscode/
+.idea/
+
+# Python caches, test caches and build outputs
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Notebook checkpoints and project notebooks with real business context
+.ipynb_checkpoints/
+notebooks/**/*.ipynb
+!notebooks/02_modelado_anomalias_no_supervisado.ipynb
+!notebooks/.gitkeep
+
+# Local configuration, secrets and credentials
+config/project.yml
+config/*.local.yml
+config/*.secret.yml
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.*
+credentials.*
+
+# Business data and derived datasets
+data/raw/**
+!data/raw/
+!data/raw/.gitkeep
+data/cache/**
+!data/cache/
+!data/cache/.gitkeep
+data/interim/**
+!data/interim/
+!data/interim/.gitkeep
+data/processed/**
+!data/processed/
+!data/processed/.gitkeep
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.xlsm
+*.parquet
+*.feather
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated reports, dashboards and embedded payloads
+reports/**
+!reports/
+!reports/.gitkeep
+!reports/figures/
+!reports/figures/.gitkeep
+!reports/tables/
+!reports/tables/.gitkeep
+**/dashboard*.html
+!src/granjas_anomalias/templates/dashboard_productivo.html
+
+# Generated models and model metadata
+models/**
+!models/
+!models/.gitkeep
+*.joblib
+*.pkl
+*.pickle
+*.onnx
+
+# Logs and runtime artifacts
+logs/**
+!logs/
+!logs/.gitkeep
+*.log
+*.tmp
+*.temp
+*.bak
+~$*
+
+# OS cruft
+.DS_Store
+Thumbs.db
