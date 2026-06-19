@@ -76,6 +76,7 @@ reports/**
 !reports/tables/.gitkeep
 **/dashboard*.html
 !src/granjas_anomalias/templates/dashboard_productivo.html
+!reports/dashboard.html
 
 # Generated models and model metadata
 models/**
