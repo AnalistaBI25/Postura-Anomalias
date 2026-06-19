@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -310,15 +310,19 @@ tr:hover td{background:var(--surface-blue);}
 }
 .phase-kpis{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:5px;
-  margin-top:6px;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:7px;
+  margin-top:8px;
 }
 .phase-kpi{
   border:1px solid var(--border);
   border-radius:8px;
-  padding:6px;
+  padding:7px;
   background:#fff;
+}
+.phase-kpi.selected{
+  border-color:var(--blue-dark);
+  box-shadow:inset 4px 0 0 var(--blue-dark);
 }
 .phase-kpi span{
   display:block;
@@ -331,6 +335,42 @@ tr:hover td{background:var(--surface-blue);}
   margin-top:2px;
   color:var(--blue-dark);
   font-size:11px;
+}
+.phase-kpi .metric-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:4px;
+  font-size:8px;
+  color:var(--text-soft);
+}
+.phase-kpi .metric-row b{
+  color:var(--blue-dark);
+  font-weight:950;
+}
+.warehouse-balance{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:7px;
+  margin:8px 0;
+}
+.warehouse-balance-item{
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:7px;
+  background:#fff;
+}
+.warehouse-balance-item span{
+  display:block;
+  color:var(--text-soft);
+  font-size:7px;
+  font-weight:850;
+}
+.warehouse-balance-item strong{
+  display:block;
+  margin-top:2px;
+  color:var(--blue-dark);
+  font-size:13px;
 }
 .chart-card.full-analysis{grid-column:1/-1;}
 @media(max-width:900px){
@@ -413,265 +453,458 @@ tr:hover td{background:var(--surface-blue);}
   .h-event{max-width:130px}
 }
 
+/* ============================================================
+   PASO 3: RESUMEN DEL GRUPO PRODUCTIVO
+   ============================================================ */
+.selector-stack{gap:7px;}
+.selector-stack label + select{margin-bottom:1px;}
+.section-heading{
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.section-heading h2{
+  margin:0;
+  font-size:15px;
+  color:var(--crio-blue-dark);
+}
+.section-heading p{
+  margin:2px 0 0;
+  font-size:9px;
+  color:var(--text-soft);
+}
+.detail-context{
+  padding:5px 9px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--surface-blue);
+  color:var(--crio-blue-dark);
+  font-size:9px;
+  font-weight:900;
+  text-align:right;
+}
+.group-kpis{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(170px,1fr));
+  gap:8px;
+}
+.group-kpi{
+  padding:10px 11px;
+  min-height:124px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.group-kpi-label{
+  font-size:9px;
+  font-weight:900;
+  color:var(--text-soft);
+}
+.group-kpi-value{
+  margin-top:4px;
+  font-size:clamp(19px,1.5vw,28px);
+  font-weight:950;
+  color:var(--crio-blue-dark);
+}
+.group-kpi-formula{
+  margin-top:6px;
+  padding-top:6px;
+  border-top:1px dashed var(--border);
+  font-size:8px;
+  line-height:1.35;
+  color:var(--text-soft);
+}
+.group-kpi-formula strong{color:var(--crio-blue-dark);}
+.group-kpi-formula.warning{color:#8B2F1E;}
+.group-kpi-formula.ok{color:var(--crio-green-dark);}
+.group-house-wrap{padding:10px 12px;}
+.group-house-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:7px;
+}
+.group-house-card{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:9px;
+  background:#fff;
+  cursor:pointer;
+  transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;
+}
+.group-house-card:hover{transform:translateY(-1px);box-shadow:var(--shadow);}
+.group-house-card.selected{
+  border-color:var(--crio-blue-dark);
+  box-shadow:inset 4px 0 0 var(--crio-blue-dark);
+}
+.group-house-head{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:flex-start;
+}
+.group-house-title{font-size:12px;font-weight:950;color:var(--crio-blue-dark);}
+.group-house-meta{font-size:7.5px;color:var(--text-soft);line-height:1.35;text-align:right;}
+.group-house-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+  margin-top:7px;
+}
+.group-house-metric{
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:5px 6px;
+  background:var(--surface-blue);
+}
+.group-house-metric span{display:block;font-size:7px;color:var(--text-soft);font-weight:800;}
+.group-house-metric b{display:block;margin-top:2px;font-size:10px;color:var(--crio-blue-dark);}
+.group-house-foot{margin-top:6px;font-size:7.5px;line-height:1.35;color:var(--text-soft);}
+.group-date-note{font-size:8px;color:var(--text-soft);font-weight:800;}
+@media(max-width:1400px){.group-kpis{grid-template-columns:repeat(3,minmax(170px,1fr));}}
+@media(max-width:900px){
+  .group-house-grid{grid-template-columns:1fr;}
+  .section-heading{align-items:flex-start;flex-direction:column;}
+  .detail-context{text-align:left;}
+}
+@media(max-width:620px){.group-kpis{grid-template-columns:1fr;}}
+.temporal-scope{
+  flex:1 1 100%;
+  padding:6px 9px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--surface-green);
+  color:var(--green-dark);
+  font-size:8.5px;
+  font-weight:850;
+  line-height:1.35;
+}
+.calendar-mode label{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 7px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
+}
+.calendar-mode label:has(input:checked){
+  background:var(--blue-dark);
+  color:#fff;
+  border-color:var(--blue-dark);
+}
+
+
+
+/* ============================================================
+   PASO 5 · ARQUITECTURA UX OPERATIVA
+   ============================================================ */
+:root{
+  --dock-height:150px;
+  --radius-lg:18px;
+  --radius-md:13px;
+  --radius-sm:9px;
+  --danger-soft:#FFF0F1;
+  --warning-soft:#FFF8D8;
+  --ok-soft:#EFF8E8;
+  --info-soft:#EEF9FD;
+}
+html{scroll-behavior:smooth;}
+body{padding:0;background:#EAF5FA;font-size:14px;}
+button,select,input{font:inherit;}
+.dashboard{width:100%;max-width:none;padding:0 14px 22px;gap:12px;}
+.panel{border-radius:var(--radius-lg);box-shadow:0 6px 18px rgba(26,66,138,.08);}
+.compat-only{display:none!important;}
+
+.control-dock{
+  position:sticky;top:0;z-index:1000;
+  margin:0 -14px 0;padding:10px 18px 8px;
+  border-radius:0 0 18px 18px;border-top:0;
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 24px rgba(26,66,138,.14);
+}
+.control-top{display:grid;grid-template-columns:minmax(270px,.8fr) minmax(520px,1.6fr) auto;gap:14px;align-items:center;}
+.brand-lockup{display:flex;align-items:center;gap:14px;min-width:0;}
+.crio-wordmark{font-size:36px;font-weight:1000;letter-spacing:-2px;color:var(--blue-dark);line-height:.85;}
+.crio-tagline{font-size:8px;font-weight:900;color:var(--green-dark);letter-spacing:.2px;margin-top:4px;}
+.brand-copy h1{font-size:22px;line-height:1.05;margin:0;color:var(--blue-dark);}
+.brand-copy p{font-size:10px;line-height:1.25;margin:4px 0 0;color:var(--text-soft);}
+.dock-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-width:0;}
+.dock-meta-item{padding:6px 9px;border:1px solid var(--border);border-radius:10px;background:var(--surface-blue);min-width:0;}
+.dock-meta-item span{display:block;font-size:7px;font-weight:900;color:var(--green-dark);text-transform:uppercase;letter-spacing:.3px;}
+.dock-meta-item b{display:block;font-size:10px;color:var(--blue-dark);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.date-console{display:grid;grid-template-columns:auto minmax(145px,1fr) auto;gap:6px;align-items:end;min-width:370px;}
+.date-console label{display:grid;gap:3px;font-size:8px;font-weight:900;color:var(--text-soft);}
+.date-console input[type=date]{min-height:38px;border:1px solid var(--blue-light);border-radius:10px;padding:7px 9px;color:var(--blue-dark);font-weight:900;background:#fff;}
+.control-btn{min-height:38px;border-radius:10px;padding:7px 10px;background:#fff;}
+.control-btn.primary{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.control-btn.icon{min-width:42px;padding:7px;}
+.control-actions{grid-column:1/-1;display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap;}
+.control-actions .date-slider{height:5px;flex:1 1 180px;min-width:120px;}
+.control-actions .date-pill{font-size:9px;}
+.workspace-tabs{display:flex;gap:6px;margin-top:8px;border-top:1px solid var(--border);padding-top:8px;overflow-x:auto;}
+.workspace-tab{border:0;border-radius:9px;background:transparent;color:var(--text-soft);padding:7px 11px;min-height:32px;white-space:nowrap;}
+.workspace-tab.active{background:var(--blue-dark);color:#fff;}
+.workspace-tab .tab-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font-size:8px;margin-left:5px;}
+.workspace-panel{display:none;gap:12px;}
+.workspace-panel.active{display:grid;}
+
+.section-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;}
+.section-bar h2{font-size:20px;margin:0;color:var(--blue-dark);}
+.section-bar p{font-size:10px;margin:4px 0 0;color:var(--text-soft);max-width:920px;line-height:1.35;}
+.section-state{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:#fff;font-size:9px;font-weight:900;white-space:nowrap;}
+.section-state::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green-light);}
+.section-state.warning::before{background:var(--yellow);}.section-state.critical::before{background:var(--red);}
+
+.executive-grid{display:grid;grid-template-columns:repeat(4,minmax(190px,1fr));gap:10px;}
+.exec-card{padding:13px 14px;min-height:126px;display:flex;flex-direction:column;justify-content:space-between;border-top:4px solid var(--blue-light);}
+.exec-card.stock{border-top-color:var(--yellow);}.exec-card.production{border-top-color:var(--green-light);}.exec-card.alert{border-top-color:var(--red);}
+.exec-label{font-size:9px;font-weight:900;color:var(--text-soft);text-transform:uppercase;letter-spacing:.25px;}
+.exec-value{font-size:27px;line-height:1.02;font-weight:1000;color:var(--blue-dark);margin:7px 0 5px;}
+.exec-note{font-size:9px;line-height:1.35;color:var(--text-soft);}
+.source-disclosure{margin-top:7px;border-top:1px solid var(--border);padding-top:6px;}
+.source-disclosure summary{cursor:pointer;font-size:8px;font-weight:900;color:var(--blue-dark);list-style:none;}
+.source-disclosure summary::-webkit-details-marker{display:none;}
+.group-kpi-formula{font-size:8.5px;line-height:1.35;margin-top:5px;color:var(--text-soft);}
+
+.alert-ribbon{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;}
+.alert-item{flex:1 1 260px;min-width:240px;border-left:5px solid var(--green-light);border-radius:10px;padding:8px 10px;background:var(--ok-soft);}
+.alert-item.preventive{border-left-color:var(--yellow);background:var(--warning-soft);}
+.alert-item.high,.alert-item.critical{border-left-color:var(--red);background:var(--danger-soft);}
+.alert-head{display:flex;justify-content:space-between;gap:8px;font-size:9px;font-weight:950;color:var(--blue-dark);}
+.alert-body{margin-top:3px;font-size:8.5px;line-height:1.3;color:var(--text-soft);}
+.alert-action{margin-top:4px;font-size:8px;font-weight:900;color:var(--green-dark);}
+
+.food-layout{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(480px,1.55fr);gap:12px;padding:14px;}
+.silo-card{border:1px solid var(--border);border-radius:14px;padding:12px;background:linear-gradient(180deg,#fff,#F5FBFE);display:grid;grid-template-columns:minmax(160px,1fr) minmax(120px,.75fr);gap:10px;align-items:center;}
+.silo-svg{width:100%;height:340px;display:block;}
+.silo-readout{display:grid;gap:8px;}
+.silo-main{font-size:27px;font-weight:1000;color:var(--blue-dark);line-height:1.05;}
+.silo-status{display:inline-flex;align-items:center;gap:6px;width:max-content;max-width:100%;padding:5px 8px;border-radius:999px;background:var(--ok-soft);color:var(--green-dark);font-size:9px;font-weight:950;}
+.silo-status.preventive{background:var(--warning-soft);color:#735D00}.silo-status.low,.silo-status.critical{background:var(--danger-soft);color:var(--red)}
+.silo-readout dl{margin:0;display:grid;gap:6px;}
+.silo-readout div{border:1px solid var(--border);border-radius:9px;padding:7px;background:#fff;}
+.silo-readout dt{font-size:7.5px;font-weight:900;color:var(--text-soft);}.silo-readout dd{margin:2px 0 0;font-size:11px;font-weight:950;color:var(--blue-dark);}
+.balance-flow{display:grid;gap:7px;align-content:start;}
+.balance-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid var(--border);border-radius:11px;padding:9px 11px;background:#fff;}
+.balance-symbol{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--blue-dark);color:#fff;font-weight:1000;font-size:17px;}
+.balance-row.positive .balance-symbol{background:var(--green-dark)}.balance-row.negative .balance-symbol{background:var(--red)}.balance-row.result .balance-symbol{background:var(--blue-light)}
+.balance-label{font-size:8.5px;font-weight:900;color:var(--blue-dark);}.balance-sub{font-size:7.5px;color:var(--text-soft);margin-top:2px;}.balance-value{font-size:16px;font-weight:1000;color:var(--blue-dark);white-space:nowrap;}
+.food-distribution{grid-column:1/-1;border:1px solid var(--border);border-radius:14px;padding:12px;background:#fff;}
+.flow-stage{position:relative;padding-top:45px;}
+.flow-svg{position:absolute;left:8%;right:8%;top:0;width:84%;height:85px;overflow:visible;pointer-events:none;}
+.flow-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.flow-house{border:1px solid var(--border);border-top:4px solid var(--blue-light);border-radius:12px;padding:10px;background:var(--surface-blue);}
+.flow-house h4{font-size:12px;margin:0;color:var(--blue-dark);}.flow-house .order{font-size:8px;color:var(--text-soft);margin-top:2px;}.flow-house .flow-value{font-size:22px;font-weight:1000;color:var(--blue-dark);margin-top:8px;}.flow-house .flow-meta{font-size:8px;line-height:1.35;color:var(--text-soft);margin-top:5px;}
+
+.group-house-wrap{padding:0;background:transparent;border:0;box-shadow:none;}
+.group-house-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.group-house-card{border:1px solid var(--border);border-radius:15px;padding:12px;background:#fff;box-shadow:0 5px 14px rgba(26,66,138,.07);cursor:default;}
+.group-house-card.selected{border-color:var(--border);box-shadow:0 5px 14px rgba(26,66,138,.07);}
+.house-card-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding-bottom:9px;border-bottom:1px solid var(--border);}
+.house-card-title{font-size:18px;font-weight:1000;color:var(--blue-dark);}.house-card-id{font-size:8px;color:var(--text-soft);line-height:1.4;margin-top:3px;}.house-badge{padding:4px 7px;border:1px solid var(--green-light);border-radius:999px;background:var(--ok-soft);font-size:8px;font-weight:950;color:var(--green-dark);}
+.house-badge.preventive{border-color:var(--yellow);background:var(--warning-soft);color:#735D00}.house-badge.critical{border-color:var(--red);background:var(--danger-soft);color:var(--red)}
+.house-sections{display:grid;gap:9px;margin-top:9px;}.house-section{border:1px solid var(--border);border-radius:11px;padding:9px;}.house-section h4{margin:0 0 7px;font-size:12px;color:var(--blue-dark);}.house-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}.house-metric{padding:7px;border-radius:9px;background:var(--surface-blue);}.house-metric span{display:block;font-size:7.5px;font-weight:850;color:var(--text-soft);}.house-metric b{display:block;font-size:13px;color:var(--blue-dark);margin-top:2px;}.house-metric small{display:block;font-size:7px;color:var(--text-soft);margin-top:2px;line-height:1.25;}.house-spark{width:100%;height:55px;margin-top:7px;display:block;}.house-detail{margin-top:8px;border-top:1px solid var(--border);padding-top:6px;}.house-detail summary{font-size:8px;font-weight:900;color:var(--blue-dark);cursor:pointer;}.house-detail p{font-size:8px;line-height:1.4;color:var(--text-soft);margin:6px 0 0;}
+
+.analysis-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:10px;}.analysis-card{grid-column:span 6;padding:12px;}.analysis-card.full{grid-column:1/-1;}.analysis-card.third{grid-column:span 4;}.analysis-card .chart-shell{height:285px;}.analysis-intro{padding:12px 15px;background:var(--info-soft);border-left:5px solid var(--blue-light);font-size:9px;line-height:1.4;color:var(--text-soft);}
+.advanced-note{padding:8px 10px;border-radius:10px;background:var(--warning-soft);font-size:8.5px;color:#735D00;margin-bottom:8px;}
+
+.technical-stack{display:grid;gap:10px;}.technical-details{padding:0;overflow:hidden;}.technical-details>summary{cursor:pointer;padding:13px 15px;font-size:14px;font-weight:950;color:var(--blue-dark);background:#fff;}.technical-details[open]>summary{border-bottom:1px solid var(--border);}.technical-content{padding:12px;}
+.anomaly-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}.anomaly-card{padding:12px;border-left:5px solid var(--green-light);}.anomaly-card.preventive{border-left-color:var(--yellow)}.anomaly-card.high,.anomaly-card.critical{border-left-color:var(--red)}.anomaly-card h3{margin:0;font-size:15px;color:var(--blue-dark)}.anomaly-score{font-size:25px;font-weight:1000;color:var(--blue-dark);margin:7px 0 4px}.anomaly-reason{font-size:8.5px;line-height:1.4;color:var(--text-soft)}
+.anomaly-table-wrap{overflow:auto;max-height:430px;border:1px solid var(--border);border-radius:12px;}.anomaly-table{min-width:980px;}.anomaly-note{font-size:9px;line-height:1.4;padding:10px 12px;background:var(--warning-soft);border-left:5px solid var(--yellow);}
+
+.footer{margin-top:4px;}
+@media(max-width:1250px){
+  .control-top{grid-template-columns:1fr 1fr}.date-console{grid-column:1/-1;min-width:0}.executive-grid{grid-template-columns:repeat(2,minmax(190px,1fr));}.food-layout{grid-template-columns:1fr}.group-house-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.analysis-card.third{grid-column:span 6;}
+}
+@media(max-width:780px){
+  .dashboard{padding:0 8px 16px}.control-dock{margin:0 -8px;padding:9px}.control-top{grid-template-columns:1fr}.dock-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.date-console{grid-template-columns:auto 1fr auto}.control-actions{justify-content:flex-start}.brand-copy p{display:none}.executive-grid{grid-template-columns:1fr}.food-layout{padding:9px}.silo-card{grid-template-columns:1fr}.silo-svg{height:280px}.flow-grid,.group-house-grid,.anomaly-summary{grid-template-columns:1fr}.analysis-card,.analysis-card.third{grid-column:1/-1}.analysis-card .chart-shell{height:320px}.section-bar{flex-direction:column}.workspace-tabs{padding-bottom:2px}.control-btn .btn-long{display:none;}
+}
+@media print{
+  .control-dock{position:static;box-shadow:none}.workspace-tabs,.control-actions,.alert-ribbon button{display:none!important}.workspace-panel{display:none!important}#tab-operation{display:grid!important}.dashboard{padding:0}.panel{box-shadow:none;break-inside:avoid}.food-layout,.group-house-grid{grid-template-columns:1fr 1fr 1fr}.silo-card{grid-template-columns:1fr}.source-disclosure{display:none}.footer{display:none}
+}
+
 </style>
 </head>
+
 <body>
 <div class="dashboard">
-  <section class="header">
-    <div class="panel brand">
-      <h1>Análisis productivo avícola</h1>
-      <p>Seguimiento diario y semanal de consumo, producción, aves disponibles e ICA frente al estándar por edad.</p>
-    </div>
-    <div class="panel selector">
-      <label for="periodSelect">Seleccionar periodo productivo</label>
-      <select id="periodSelect"></select>
-      <small id="standardSource"></small>
-    </div>
-    <div class="panel meta">
-      <div class="meta-item"><div class="meta-label">Centro</div><div class="meta-value" id="metaCentro">-</div></div>
-      <div class="meta-item"><div class="meta-label">Caseta</div><div class="meta-value" id="metaCaseta">-</div></div>
-      <div class="meta-item"><div class="meta-label">Estado</div><div class="meta-value" id="metaEstado">-</div></div>
-      <div class="meta-item"><div class="meta-label">Lote</div><div class="meta-value" id="metaLote">-</div></div>
-      <div class="meta-item"><div class="meta-label">Orden</div><div class="meta-value" id="metaOrden">-</div></div>
-      <div class="meta-item"><div class="meta-label">Inicio</div><div class="meta-value" id="metaInicio">-</div></div>
-    </div>
-  </section>
-
-  <section class="kpis">
-    <div class="panel kpi"><div><div class="kpi-label">Aves disponibles</div><div class="kpi-value" id="kpiAves">-</div></div><div class="kpi-note">Base diaria para consumo y producción esperada.</div></div>
-
-    <div class="panel kpi"><div><div class="kpi-label">Stock del día</div><div class="kpi-value" id="kpiStockDia">-</div></div><div class="kpi-note" id="kpiStockNota">Stock reconstruido; pendiente de validar contra SAP.</div></div>
-
-    <div class="panel kpi"><div><div class="kpi-label">Consumo del día</div><div class="kpi-value" id="kpiConsumoDia">-</div></div><div class="kpi-note">Consumo neto de alimento registrado en la fecha seleccionada.</div></div>
-
-    <div class="panel kpi"><div><div class="kpi-label">Entradas / reabastos del día</div><div class="kpi-value" id="kpiEntradasDia">-</div></div><div class="kpi-note">Entradas de alimento registradas en la fecha seleccionada.</div></div>
-
-    <div class="panel kpi"><div><div class="kpi-label">Consumo acumulado</div><div class="kpi-value" id="kpiConsumo">-</div></div><div class="kpi-note">Kilogramos registrados durante el periodo.</div></div>
-    <div class="panel kpi"><div><div class="kpi-label">Producción acumulada</div><div class="kpi-value" id="kpiProduccion">-</div></div><div class="kpi-note">Kilogramos netos de huevo.</div></div>
-    <div class="panel kpi"><div><div class="kpi-label">Mortalidad acumulada</div><div class="kpi-value" id="kpiMortalidad">-</div></div><div class="kpi-note">Aves registradas durante el periodo.</div></div>
-    <div class="panel kpi"><div><div class="kpi-label">ICA principal</div><div class="kpi-value" id="kpiIca">-</div></div><div class="kpi-note" id="kpiIcaStd">Estándar: -</div></div>
-    <div class="panel kpi"><div><div class="kpi-label">Estado ICA</div><div class="status" id="kpiEstado">-</div></div><div class="kpi-note" id="kpiEdad">-</div></div>
-  </section>
-
-  <section class="panel toolbar toolbar-calendar">
-    <strong>Exploración temporal</strong>
-    <div class="calendar-mode">
-      <label><input type="radio" name="calendarMode" value="range" checked> Rango</label>
-      <label><input type="radio" name="calendarMode" value="single"> Día</label>
-    </div>
-    <div id="calendarRangeFields" class="calendar-fields">
-      <label>Desde <input id="dateFrom" type="date"></label>
-      <label>Hasta <input id="dateTo" type="date"></label>
-    </div>
-    <div id="calendarSingleFields" class="calendar-fields hidden">
-      <label>Día <input id="singleDate" type="date"></label>
-    </div>
-    <div class="calendar-actions">
-      <button id="applyCalendarBtn">Aplicar</button>
-      <button id="allPeriodBtn">Todo</button>
-      <button id="last30Btn">30 días</button>
-      <button id="last90Btn">90 días</button>
-      <button id="currentPhaseBtn">Fase actual</button>
-    </div>
-    <button id="prevDay">◀ Día</button>
-    <button id="playPause" class="play-button">▶ Reproducir</button>
-    <button id="nextDay">Día ▶</button>
-    <input class="date-slider" id="dateSlider" type="range" min="0" max="0" value="0" step="1">
-    <span class="date-pill" id="datePill">-</span>
-  </section>
-
-  <section class="charts">
-    <article class="panel chart-card" style="grid-column:1/-1;">
-      <div class="chart-title">Línea del tiempo horizontal del periodo</div>
-      <div class="chart-subtitle">Vista ejecutiva con bloques de fase y únicamente movimientos SAP o hitos no recurrentes. El detalle diario de consumo, producción y mortalidad permanece en sus gráficas y en el validador técnico.</div>
-      <div class="timeline-tools"><button id="toggleTimelineBtn" class="timeline-expand">Compactar / expandir</button></div>
-      <div class="h-timeline-wrap"><div id="notionTimeline" class="h-timeline"></div></div>
-      <div class="gantt-legend">
-        <span class="gantt-chip"><b>▰</b>Fase</span>
-        <span class="gantt-chip"><b>↓</b>Entrada / reabasto</span>
-                <span class="gantt-chip"><b>⇄</b>Traspaso 301/311</span>
-        <span class="gantt-chip"><b>⚙</b>Ajustes 511/512 / WI</span>
-        <span class="gantt-chip"><b>⇢</b>Logística WL / 641 / 643</span>
-        <span class="gantt-chip"><b>▲</b>Merma 551/552</span>
-        <span class="gantt-chip"><b>◆</b>Primera producción</span>
-                      </div>
-      <div class="insight" id="timelineInsight">La línea del tiempo se reproduce por fecha y sigue corriendo aunque hagas scroll en la página.</div>
-      <div class="event-section">
-        <div class="chart-title" style="font-size:18px;margin-top:8px;">Eventos y evolución del periodo</div>
-        <div class="chart-subtitle">Las tarjetas se activan conforme avanza la fecha seleccionada o la reproducción automática.</div>
-        <div id="eventStrip" class="event-strip"></div>
-      </div>
-    </article>
-
-    <article class="panel chart-card half">
-      <div class="chart-title">Producción diaria</div>
-      <div class="chart-subtitle">Producción real frente a la producción esperada para la edad y las aves disponibles.</div>
-      <div class="chart-shell tall"><canvas id="productionChart"></canvas></div>
-      <div class="insight" id="productionInsight">-</div>
-    </article>
-
-    <article class="panel chart-card half">
-      <div class="chart-title">Consumo diario</div>
-      <div class="chart-subtitle">Consumo real frente al consumo esperado diario para las aves disponibles.</div>
-      <div class="chart-shell tall"><canvas id="consumptionChart"></canvas></div>
-      <div class="insight" id="consumptionInsight">-</div>
-    </article>
-
-    <article class="panel chart-card half">
-      <div class="chart-title">Stock de alimento y movimientos diarios</div>
-      <div class="chart-subtitle">Evolución del stock reconstruido junto con entradas, traspasos, logística, ajustes, mermas y consumo del día.</div>
-      <div class="chart-shell tall"><canvas id="stockChart"></canvas></div>
-      <div class="chart-zoom-note">Doble clic sobre la gráfica para activar o desactivar el zoom independiente.</div>
-      <div class="insight" id="stockInsight">-</div>
-    </article>
-
-    <article class="panel chart-card half">
-      <div class="chart-title">Producción vs. consumo en el tiempo</div>
-      <div class="chart-subtitle">Lectura cronológica conjunta para identificar respuesta productiva, desfases y periodos de consumo sin crecimiento equivalente de producción.</div>
-      <div class="chart-shell tall"><canvas id="productionConsumptionChart"></canvas></div>
-      <div class="insight" id="productionConsumptionInsight">-</div>
-    </article>
-
-    <article class="panel chart-card" style="grid-column:1/-1;">
-      <div class="chart-title">Almacén compartido: stock global y consumo por fase de cada caseta</div>
-      <div class="chart-subtitle">La primera gráfica muestra el stock y los movimientos globales del almacén. Debajo, cada caseta conserva su propia área apilada por fase sobre el mismo eje semanal, sin mezclar ciclos ni forzar fechas de inicio comunes.</div>
-
-      <div class="warehouse-global-card">
-        <div class="caseta-phase-title">Stock global, entradas y movimientos del almacén compartido</div>
-        <div class="caseta-phase-note">El stock pertenece al almacén común; no se asigna artificialmente a una caseta.</div>
-        <div class="chart-shell"><canvas id="warehouseGlobalChart"></canvas></div>
-      </div>
-
-      <div class="warehouse-phase-grid">
-        <div class="caseta-phase-card" id="phaseCasetaCard0">
-          <div class="caseta-phase-title" id="phaseCasetaTitle0">Caseta 1</div>
-          <div class="caseta-phase-note">Consumo semanal apilado por fase.</div>
-          <div class="chart-shell"><canvas id="phaseCasetaChart0"></canvas></div>
+  <header class="control-dock panel" aria-label="Panel de control del reporte">
+    <div class="control-top">
+      <div class="brand-lockup">
+        <div aria-label="CRÍO">
+          <div class="crio-wordmark">CRÍO</div>
+          <div class="crio-tagline">Naturalmente Fresco</div>
         </div>
-        <div class="caseta-phase-card" id="phaseCasetaCard1">
-          <div class="caseta-phase-title" id="phaseCasetaTitle1">Caseta 2</div>
-          <div class="caseta-phase-note">Consumo semanal apilado por fase.</div>
-          <div class="chart-shell"><canvas id="phaseCasetaChart1"></canvas></div>
-        </div>
-        <div class="caseta-phase-card" id="phaseCasetaCard2">
-          <div class="caseta-phase-title" id="phaseCasetaTitle2">Caseta 3</div>
-          <div class="caseta-phase-note">Consumo semanal apilado por fase.</div>
-          <div class="chart-shell"><canvas id="phaseCasetaChart2"></canvas></div>
+        <div class="brand-copy">
+          <h1>Reporte diario productivo</h1>
+          <p>Almacén compartido, aves y producción de las tres casetas activas.</p>
         </div>
       </div>
 
-      <div class="phase-kpis" id="phaseKpis"></div>
-      <div class="insight" id="phaseAreaInsight">Las fases se separan cuantitativamente cuando la base contiene el detalle por material; las transiciones sin desglose se conservan como categoría auditable.</div>
-    </article>
+      <div class="dock-meta">
+        <div class="dock-meta-item"><span>Granja</span><b id="metaGranja">CHENCOPO 2</b></div>
+        <div class="dock-meta-item"><span>Centro</span><b id="metaCentro">-</b></div>
+        <div class="dock-meta-item"><span>Módulo / grupo</span><b id="metaCaseta">-</b></div>
+        <div class="dock-meta-item"><span>Estado</span><b id="metaEstado">-</b></div>
+        <div class="dock-meta-item"><span>Casetas</span><b id="metaLote">-</b></div>
+        <div class="dock-meta-item"><span>Periodo</span><b id="metaOrden">-</b></div>
+        <div class="compat-only"><span>Integridad</span><b id="metaInicio">-</b></div>
+      </div>
 
-    <article class="panel chart-card narrow">
-      <div class="chart-title">Relación consumo–producción</div>
-      <div class="chart-subtitle">Cada punto representa un día. La línea muestra la tendencia lineal y el indicador R² resume la fuerza de la relación.</div>
-      <div class="chart-shell tall"><canvas id="scatterChart"></canvas></div>
-      <div class="insight" id="scatterInsight">-</div>
-    </article>
+      <div class="date-console">
+        <button id="prevDay" class="control-btn icon" title="Día anterior">◀</button>
+        <label>Fecha seleccionada<input id="singleDate" type="date"></label>
+        <button id="nextDay" class="control-btn icon" title="Día siguiente">▶</button>
+        <div class="control-actions">
+          <button id="latestDateBtn" class="control-btn"><span class="btn-long">Última fecha</span><span aria-hidden="true"> ↥</span></button>
+          <button id="playPause" class="control-btn primary">▶ Reproducir</button>
+          <button id="printBtn" class="control-btn">Imprimir</button>
+          <input class="date-slider" id="dateSlider" type="range" min="0" max="0" value="0" step="1" aria-label="Reproductor temporal">
+          <span class="date-pill" id="datePill">-</span>
+        </div>
+      </div>
+    </div>
 
-    <article class="panel chart-card half">
-      <div class="chart-title">ICA semanal por edad</div>
-      <div class="chart-subtitle">Comparación del ICA real semanal contra el valor esperado para la misma semana de edad.</div>
-      <div class="chart-shell"><canvas id="icaChart"></canvas></div>
-      <div class="insight" id="icaInsight">-</div>
-    </article>
+    <nav class="workspace-tabs" aria-label="Secciones del dashboard">
+      <button class="workspace-tab active" data-workspace="operation">Operación diaria</button>
+      <button class="workspace-tab" data-workspace="analysis">Análisis histórico</button>
+      <button class="workspace-tab" data-workspace="anomalies">Anomalías y predicción <span class="tab-badge" id="anomalyTabCount">0</span></button>
+      <button class="workspace-tab" data-workspace="technical">Control técnico</button>
+    </nav>
 
-    <article class="panel chart-card half">
-      <div class="chart-title">Evolución de aves y mortalidad</div>
-      <div class="chart-subtitle">Aves disponibles y mortalidad acumulada a lo largo del periodo productivo.</div>
-      <div class="chart-shell"><canvas id="birdsChart"></canvas></div>
-      <div class="insight" id="birdsInsight">-</div>
-    </article>
+    <div class="compat-only" aria-hidden="true">
+      <select id="periodSelect"></select><select id="houseSelect"></select><small id="standardSource"></small>
+      <label><input type="radio" name="calendarMode" value="day" checked></label>
+      <label><input type="radio" name="calendarMode" value="week"></label>
+      <label><input type="radio" name="calendarMode" value="range"></label>
+      <div id="calendarSingleFields"></div><div id="calendarWeekFields"><input id="weekDate" type="date"></div>
+      <div id="calendarRangeFields"><input id="dateFrom" type="date"><input id="dateTo" type="date"></div>
+      <button id="applyCalendarBtn"></button><button id="allPeriodBtn"></button><button id="last30Btn"></button><button id="last90Btn"></button><button id="currentPhaseBtn"></button>
+      <div id="temporalScope"></div><div id="detailContext"></div>
+      <div id="detailKpiAvesLabel"></div><div id="detailKpiProduccionPeriodoLabel"></div><div id="detailKpiConsumoPeriodoLabel"></div><div id="detailKpiMortalidadPeriodoLabel"></div>
+      <div id="kpiAves"></div><div id="kpiStockDia"></div><div id="kpiConsumoDia"></div><div id="kpiEntradasDia"></div><div id="kpiStockNota"></div><div id="kpiConsumo"></div><div id="kpiProduccion"></div><div id="kpiMortalidad"></div><div id="kpiIca"></div><div id="kpiIcaStd"></div><div id="kpiEstado"></div><div id="kpiEdad"></div>
+    </div>
+  </header>
 
-    <article class="panel chart-card half">
-      <div class="chart-title">Composición de movimientos de alimento</div>
-      <div class="chart-subtitle">Distribución acumulada hasta la fecha seleccionada. Ayuda a explicar entradas, consumo, traspasos, ajustes, logística y mermas.</div>
-      <div class="movement-grid">
-        <div class="chart-shell"><canvas id="movementChart"></canvas></div>
-        <div>
-          <div class="movement-summary">
-            <div class="movement-mini"><span>Entradas</span><strong id="mvEntradas">-</strong></div>
-            <div class="movement-mini"><span>Consumo</span><strong id="mvConsumo">-</strong></div>
-            <div class="movement-mini"><span>Traspasos</span><strong id="mvTraspasos">-</strong></div>
-            <div class="movement-mini"><span>Ajustes</span><strong id="mvAjustes">-</strong></div>
-            <div class="movement-mini"><span>Logística</span><strong id="mvLogistica">-</strong></div>
-            <div class="movement-mini"><span>Mermas</span><strong id="mvMermas">-</strong></div>
+  <main>
+    <section id="tab-operation" class="workspace-panel active" data-workspace-panel="operation">
+      <section class="panel section-bar">
+        <div><h2>Resumen ejecutivo</h2><p>Lectura del día seleccionado. Los totales de aves, consumo, producción y mortalidad provienen de la suma de las tres casetas; el stock pertenece al almacén compartido.</p></div>
+        <div class="section-state" id="overallState">Operación sin alertas críticas</div>
+      </section>
+
+      <section class="executive-grid">
+        <article class="panel exec-card"><div><div class="exec-label" id="groupKpiAvesLabel">Aves disponibles totales</div><div class="exec-value" id="groupKpiAves">-</div><div class="exec-note">Saldo al cierre de las tres casetas.</div></div><details class="source-disclosure"><summary>Ver origen de la suma</summary><div class="group-kpi-formula" id="groupKpiAvesFormula">-</div></details></article>
+        <article class="panel exec-card production"><div><div class="exec-label" id="groupKpiProduccionLabel">Producción total del día</div><div class="exec-value" id="groupKpiProduccion">-</div><div class="exec-note">Suma de producción de las órdenes activas.</div></div><details class="source-disclosure"><summary>Ver origen de la suma</summary><div class="group-kpi-formula" id="groupKpiProduccionFormula">-</div></details></article>
+        <article class="panel exec-card"><div><div class="exec-label" id="groupKpiConsumoLabel">Consumo total del día</div><div class="exec-value" id="groupKpiConsumo">-</div><div class="exec-note">Consumo distribuido por caseta y conciliado contra almacén.</div></div><details class="source-disclosure"><summary>Ver origen de la suma</summary><div class="group-kpi-formula" id="groupKpiConsumoFormula">-</div></details></article>
+        <article class="panel exec-card stock"><div><div class="exec-label" id="groupKpiStockLabel">Stock global al cierre</div><div class="exec-value" id="groupKpiStock">-</div><div class="exec-note">Saldo único del almacén compartido.</div></div><details class="source-disclosure"><summary>Ver conciliación</summary><div class="group-kpi-formula" id="groupKpiStockFormula">-</div></details></article>
+        <article class="panel exec-card"><div><div class="exec-label" id="groupKpiMortalidadLabel">Mortalidad total del día</div><div class="exec-value" id="groupKpiMortalidad">-</div><div class="exec-note">Suma de mortalidad diaria de las tres casetas.</div></div><details class="source-disclosure"><summary>Ver origen de la suma</summary><div class="group-kpi-formula" id="groupKpiMortalidadFormula">-</div></details></article>
+        <article class="panel exec-card"><div><div class="exec-label">ICA consolidado</div><div class="exec-value" id="opsIcaConsolidated">-</div><div class="exec-note">Promedio ponderado por aves disponibles cuando es evaluable.</div></div></article>
+        <article class="panel exec-card alert"><div><div class="exec-label">Alertas operativas</div><div class="exec-value" id="opsAlertCount">0</div><div class="exec-note" id="opsAlertNote">Sin alertas críticas.</div></div></article>
+        <article class="panel exec-card stock"><div><div class="exec-label">Días estimados de alimento</div><div class="exec-value" id="opsDaysSupply">-</div><div class="exec-note" id="opsDaysNote">Estimación con consumo reciente.</div></div><details class="source-disclosure"><summary>Entradas / reabastos</summary><div class="group-kpi-formula" id="groupKpiEntradasFormula">-</div><div class="compat-only" id="groupKpiEntradasLabel"></div><div class="compat-only" id="groupKpiEntradas"></div></details></article>
+      </section>
+      <div class="compat-only" id="groupKpiDate"></div>
+
+      <section class="panel alert-ribbon" id="opsAlertStrip" aria-live="polite"></section>
+
+      <section class="panel">
+        <div class="section-bar">
+          <div><h2>Alimento · almacén compartido</h2><p>El stock, las entradas y los movimientos son globales. El consumo se distribuye por caseta y orden productiva.</p></div>
+          <div class="section-state" id="inventoryState">Inventario normal</div>
+        </div>
+        <div class="food-layout">
+          <div class="silo-card">
+            <svg class="silo-svg" viewBox="0 0 250 390" role="img" aria-label="Nivel visual del almacén de alimento">
+              <defs>
+                <clipPath id="siloClip"><path d="M48 55 Q48 35 70 35 H180 Q202 35 202 55 V242 L166 315 H84 L48 242 Z"/></clipPath>
+                <pattern id="grainPattern" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="4" cy="5" r="1.4" fill="#D99E00" opacity=".55"/><circle cx="12" cy="11" r="1.2" fill="#D99E00" opacity=".45"/></pattern>
+              </defs>
+              <path d="M48 55 Q48 35 70 35 H180 Q202 35 202 55 V242 L166 315 H84 L48 242 Z" fill="#F7FCFE" stroke="#1A428A" stroke-width="7"/>
+              <rect id="siloFillBase" x="45" y="315" width="160" height="0" fill="#FDC600" clip-path="url(#siloClip)" style="transition:y .5s ease,height .5s ease"/>
+              <rect id="siloFillTexture" x="45" y="315" width="160" height="0" fill="url(#grainPattern)" clip-path="url(#siloClip)" style="transition:y .5s ease,height .5s ease"/>
+              <path d="M84 315 H166 V350 H84 Z" fill="#DDF5FB" stroke="#1A428A" stroke-width="7"/>
+              <line x1="215" y1="55" x2="215" y2="315" stroke="#315B7F" stroke-width="3"/><line x1="207" y1="55" x2="223" y2="55" stroke="#315B7F" stroke-width="3"/><line x1="207" y1="185" x2="223" y2="185" stroke="#315B7F" stroke-width="3"/><line x1="207" y1="315" x2="223" y2="315" stroke="#315B7F" stroke-width="3"/>
+              <text x="125" y="23" text-anchor="middle" fill="#1A428A" font-size="18" font-weight="900">Tolva / almacén</text>
+            </svg>
+            <div class="silo-readout">
+              <div class="silo-main" id="siloStock">-</div>
+              <div class="silo-status" id="siloStatus">Sin datos</div>
+              <dl>
+                <div><dt>Nivel visual</dt><dd id="siloPct">-</dd></div>
+                <div><dt>Días estimados</dt><dd id="siloDays">-</dd></div>
+                <div><dt>Material / fase</dt><dd id="siloMaterial">-</dd></div>
+                <div><dt>Capacidad física</dt><dd id="siloCapacity">No configurada</dd></div>
+                <div><dt>Referencia visual</dt><dd id="siloReference">-</dd></div>
+              </dl>
+            </div>
           </div>
-          <div class="insight" id="movementInsight">La composición se actualiza conforme avanza la reproducción.</div>
+
+          <div class="balance-flow" id="foodBalanceRows"></div>
+
+          <div class="food-distribution">
+            <div class="chart-title">Distribución del alimento hacia las casetas</div>
+            <div class="chart-subtitle">Cada ramificación identifica la orden, el consumo del día, su participación y el acumulado del ciclo.</div>
+            <div class="flow-stage">
+              <svg class="flow-svg" viewBox="0 0 900 90" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M450 2 V28 H150 V78" fill="none" stroke="#00B2E3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" id="flowLine0"/>
+                <path d="M450 2 V78" fill="none" stroke="#00B2E3" stroke-width="5" stroke-linecap="round" id="flowLine1"/>
+                <path d="M450 2 V28 H750 V78" fill="none" stroke="#00B2E3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" id="flowLine2"/>
+              </svg>
+              <div class="flow-grid" id="foodFlow"></div>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section class="panel section-bar">
+        <div><h2>Casetas, órdenes, aves y producción</h2><p>Las tres unidades operativas permanecen visibles simultáneamente. No es necesario seleccionar una caseta para consultar sus indicadores principales.</p></div>
+        <div class="group-date-note" id="groupHouseSubtitle">-</div>
+      </section>
+      <section class="group-house-wrap"><div class="group-house-grid" id="groupHouseCards"></div></section>
+    </section>
+
+    <section id="tab-analysis" class="workspace-panel" data-workspace-panel="analysis">
+      <div class="panel analysis-intro"><strong>Análisis histórico.</strong> Las gráficas usan las tres casetas y el almacén compartido cuando el payload lo permite. Se muestran como apoyo de diagnóstico, no como primera pantalla operativa.</div>
+      <section class="analysis-grid">
+        <article class="panel analysis-card"><div class="chart-title">Producción por caseta y total esperado</div><div class="chart-subtitle">Comparación histórica simultánea de las tres órdenes productivas.</div><div class="chart-shell"><canvas id="productionChart"></canvas></div><div class="insight" id="productionInsight">-</div></article>
+        <article class="panel analysis-card"><div class="chart-title">Consumo por caseta y consumo global</div><div class="chart-subtitle">Consumo histórico de las tres casetas frente al valor esperado total.</div><div class="chart-shell"><canvas id="consumptionChart"></canvas></div><div class="insight" id="consumptionInsight">-</div></article>
+        <article class="panel analysis-card"><div class="chart-title">Stock y movimientos del almacén</div><div class="chart-subtitle">Stock global, reabastos, movimientos netos y consumo total.</div><div class="chart-shell"><canvas id="stockChart"></canvas></div><div class="insight" id="stockInsight">-</div></article>
+        <article class="panel analysis-card"><div class="chart-title">Producción total frente a consumo global</div><div class="chart-subtitle">Respuesta productiva conjunta de las tres casetas.</div><div class="chart-shell"><canvas id="productionConsumptionChart"></canvas></div><div class="insight" id="productionConsumptionInsight">-</div></article>
+        <article class="panel analysis-card full"><div class="chart-title" id="warehouseGlobalTitle">Almacén compartido y consumo por caseta</div><div class="chart-subtitle" id="warehouseGlobalNote">-</div><div class="chart-shell"><canvas id="warehouseGlobalChart"></canvas></div><div class="warehouse-balance" id="warehouseBalance"></div></article>
+        <article class="panel analysis-card third" id="phaseCasetaCard0"><div class="chart-title" id="phaseCasetaTitle0">Caseta 1</div><div class="chart-shell"><canvas id="phaseCasetaChart0"></canvas></div></article>
+        <article class="panel analysis-card third" id="phaseCasetaCard1"><div class="chart-title" id="phaseCasetaTitle1">Caseta 2</div><div class="chart-shell"><canvas id="phaseCasetaChart1"></canvas></div></article>
+        <article class="panel analysis-card third" id="phaseCasetaCard2"><div class="chart-title" id="phaseCasetaTitle2">Caseta 3</div><div class="chart-shell"><canvas id="phaseCasetaChart2"></canvas></div></article>
+        <article class="panel analysis-card full"><div class="phase-kpis" id="phaseKpis"></div><div class="insight" id="phaseAreaInsight">-</div></article>
+        <article class="panel analysis-card"><div class="chart-title">ICA semanal de las tres casetas</div><div class="chart-subtitle">Comparación por semana de edad.</div><div class="chart-shell"><canvas id="icaChart"></canvas></div><div class="insight" id="icaInsight">-</div></article>
+        <article class="panel analysis-card"><div class="chart-title">Aves disponibles y mortalidad total</div><div class="chart-subtitle">Evolución conjunta de las tres casetas.</div><div class="chart-shell"><canvas id="birdsChart"></canvas></div><div class="insight" id="birdsInsight">-</div></article>
+        <article class="panel analysis-card"><div class="advanced-note">Análisis exploratorio. R² describe asociación lineal y no implica causalidad.</div><div class="chart-title">Relación consumo–producción global</div><div class="chart-shell"><canvas id="scatterChart"></canvas></div><div class="insight" id="scatterInsight">-</div></article>
+        <article class="panel analysis-card"><div class="chart-title">Composición de movimientos del almacén</div><div class="movement-grid"><div class="chart-shell"><canvas id="movementChart"></canvas></div><div><div class="movement-summary"><div class="movement-mini"><span>Entradas</span><strong id="mvEntradas">-</strong></div><div class="movement-mini"><span>Consumo</span><strong id="mvConsumo">-</strong></div><div class="movement-mini"><span>Traspasos</span><strong id="mvTraspasos">-</strong></div><div class="movement-mini"><span>Ajustes</span><strong id="mvAjustes">-</strong></div><div class="movement-mini"><span>Logística</span><strong id="mvLogistica">-</strong></div><div class="movement-mini"><span>Mermas</span><strong id="mvMermas">-</strong></div></div><div class="insight" id="movementInsight">-</div></div></div></article>
+      </section>
+    </section>
+
+    <section id="tab-anomalies" class="workspace-panel" data-workspace-panel="anomalies">
+      <div class="panel anomaly-note"><strong>Alcance actual:</strong> el payload contiene detección histórica, score, severidad y motivos de anomalía. No contiene todavía pronósticos futuros; esa capacidad corresponde a la fase de modelado predictivo.</div>
+      <section class="anomaly-summary" id="anomalySummary"></section>
+      <section class="panel table-card">
+        <div class="section-bar"><div><h2>Histórico de anomalías hasta la fecha</h2><p>Eventos detectados por las reglas y scores existentes, organizados por caseta y orden.</p></div></div>
+        <div class="anomaly-table-wrap"><table class="anomaly-table"><thead><tr><th>Fecha</th><th>Caseta</th><th>Orden</th><th>Score</th><th>Severidad</th><th>Indicador / motivo</th><th>Acción sugerida</th></tr></thead><tbody id="anomalyHistoryBody"></tbody></table></div>
+      </section>
+    </section>
+
+    <section id="tab-technical" class="workspace-panel" data-workspace-panel="technical">
+      <div class="technical-stack">
+        <details class="panel technical-details" open><summary>Línea del tiempo y eventos SAP</summary><div class="technical-content"><div class="timeline-tools"><button id="toggleTimelineBtn" class="timeline-expand">Compactar / expandir</button></div><div class="h-timeline-wrap"><div id="notionTimeline" class="h-timeline"></div></div><div class="insight" id="timelineInsight">-</div><div class="event-section"><div class="chart-title">Eventos del periodo</div><div id="eventStrip" class="event-strip"></div></div></div></details>
+        <details class="panel technical-details"><summary>Resumen semanal ejecutivo</summary><div class="technical-content"><div class="table-wrap"><table><thead><tr><th>Semana</th><th>Periodo</th><th>Consumo real</th><th>Consumo esperado</th><th>Producción real</th><th>Producción esperada</th><th>ICA real</th><th>ICA esperado</th><th>Estado</th></tr></thead><tbody id="weeklyTable"></tbody></table></div></div></details>
+        <details class="panel technical-details" id="validatorDetails"><summary>Validador técnico y conciliación</summary><div class="technical-content"><div class="validator-tabs"><button class="validator-tab active" data-validator-tab="daily">Día seleccionado</button><button class="validator-tab" data-validator-tab="history">Histórico</button><button class="validator-tab" data-validator-tab="stock">Conciliación de stock</button></div><div class="validator-panel active" id="validator-daily"><div class="table-wrap"><table class="validator-table"><thead><tr><th>Fecha</th><th>Fase</th><th>Movimiento</th><th>Evento</th><th>Entrada</th><th>Consumo</th><th>Traspasos</th><th>Ajustes</th><th>Logística</th><th>Merma</th><th>Stock</th><th>Descripción</th></tr></thead><tbody id="validatorDailyBody"></tbody></table></div></div><div class="validator-panel" id="validator-history"><div class="table-wrap"><table class="validator-table"><thead><tr><th>Fecha</th><th>Fase</th><th>Movimiento</th><th>Evento</th><th>Entrada</th><th>Consumo</th><th>Traspasos</th><th>Ajustes</th><th>Logística</th><th>Merma</th><th>Stock</th><th>Descripción</th></tr></thead><tbody id="validatorHistoryBody"></tbody></table></div></div><div class="validator-panel" id="validator-stock"><div class="table-wrap"><table class="validator-table"><thead><tr><th>Fecha</th><th>Stock anterior</th><th>Entradas</th><th>Consumo</th><th>Otros</th><th>Stock calculado</th><th>Stock reconstruido</th><th>Diferencia</th><th>Validación</th></tr></thead><tbody id="validatorStockBody"></tbody></table></div></div></div></details>
       </div>
-    </article>
-  </section>
+    </section>
+  </main>
 
-  <details class="panel table-card">
-    <summary class="chart-title" style="cursor:pointer;">Resumen semanal ejecutivo</summary>
-    <div class="chart-subtitle">Lectura rápida por semana de edad para validación con operación.</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Semana</th><th>Periodo de fechas</th><th>Consumo real kg</th><th>Consumo esperado kg</th>
-          <th>Producción real kg</th><th>Producción esperada kg</th><th>ICA real</th><th>ICA esperado</th><th>Estado</th>
-        </tr></thead>
-        <tbody id="weeklyTable"></tbody>
-      </table>
-    </div>
-  </details>
-
-  <details class="panel table-card" id="validatorDetails">
-    <summary class="chart-title" style="cursor:pointer;">Validador técnico de movimientos</summary>
-    <div class="chart-subtitle">Panel de auditoría por fecha. Conserva códigos, eventos, cantidades e impacto operativo sin saturar la vista ejecutiva.</div>
-
-    <div class="validator-tabs">
-      <button class="validator-tab active" data-validator-tab="daily">Día seleccionado</button>
-      <button class="validator-tab" data-validator-tab="history">Histórico hasta la fecha</button>
-      <button class="validator-tab" data-validator-tab="stock">Conciliación de stock</button>
-    </div>
-
-    <div class="validator-panel active" id="validator-daily">
-      <div class="table-wrap">
-        <table class="validator-table">
-          <thead><tr>
-            <th>Fecha</th><th>Fase</th><th>Movimiento</th><th>Evento</th>
-            <th>Entrada kg</th><th>Consumo kg</th><th>Traspasos kg</th>
-            <th>Ajustes kg</th><th>Logística kg</th><th>Merma kg</th>
-            <th>Stock kg</th><th>Descripción</th>
-          </tr></thead>
-          <tbody id="validatorDailyBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="validator-panel" id="validator-history">
-      <div class="table-wrap">
-        <table class="validator-table">
-          <thead><tr>
-            <th>Fecha</th><th>Fase</th><th>Movimiento</th><th>Evento</th>
-            <th>Entrada kg</th><th>Consumo kg</th><th>Traspasos kg</th>
-            <th>Ajustes kg</th><th>Logística kg</th><th>Merma kg</th>
-            <th>Stock kg</th><th>Descripción</th>
-          </tr></thead>
-          <tbody id="validatorHistoryBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="validator-panel" id="validator-stock">
-      <div class="table-wrap">
-        <table class="validator-table">
-          <thead><tr>
-            <th>Fecha</th><th>Stock anterior kg</th><th>Entradas kg</th>
-            <th>Consumo kg</th><th>Otros movimientos kg</th>
-            <th>Stock calculado kg</th><th>Stock reconstruido kg</th><th>Diferencia kg</th><th>Validación</th>
-          </tr></thead>
-          <tbody id="validatorStockBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </details>
-
-  <section class="panel footer">Actualizado: <span id="generatedAt"></span></section>
+  <footer class="panel footer">Actualizado: <span id="generatedAt"></span></footer>
 </div>
 
 <script>
@@ -682,7 +915,7 @@ const COLORS = {
   paleBlue:'#DDF5FB', paleGreen:'#EAF5DF'
 };
 
-const state = { periodId:null, data:null, index:0, charts:{}, playing:false, timer:null, speedMs:420, events:[], visibleStart:0, visibleEnd:null };
+const state = { groupId:null, group:null, houseId:null, periodId:null, data:null, index:0, charts:{}, playing:false, timer:null, speedMs:420, events:[], viewMode:'day', visibleStart:0, visibleEnd:null, chartStart:0, chartEnd:null };
 const el = id => document.getElementById(id);
 
 function fmt(value, decimals=0){
@@ -694,6 +927,454 @@ function fmtAuto(value){
   const n = Math.abs(Number(value));
   return fmt(value, n >= 100 ? 0 : n >= 10 ? 1 : 2);
 }
+
+function numberOrZero(value){
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function groupHouseIds(){
+  return Array.isArray(state.group?.meta?.casetas)
+    ? state.group.meta.casetas.map(String)
+    : [];
+}
+
+function sharedDayForDate(date){
+  return (PAYLOAD.shared_store?.daily || []).find(row=>row.fecha===date) || null;
+}
+
+function formulaFromMap(houses,map,unit='kg',missingAsZero=true){
+  let total = 0;
+  const parts = houses.map(house=>{
+    const raw = map?.[house];
+    const number = Number(raw);
+    if(!Number.isFinite(number)){
+      return `${house}: ${missingAsZero ? '0' : 's/d'}`;
+    }
+    total += number;
+    return `${house}: ${fmtAuto(number)}`;
+  });
+  const suffix = unit ? ` ${unit}` : '';
+  return {
+    total,
+    text:`${parts.join(' + ')} = ${fmtAuto(total)}${suffix}`
+  };
+}
+
+
+function clampIndex(index){
+  if(!state.data?.daily?.length) return 0;
+  return Math.max(0,Math.min(Number(index)||0,state.data.daily.length-1));
+}
+
+function modeLabel(mode=state.viewMode){
+  return mode==='day' ? 'día' : mode==='week' ? 'semana' : 'rango';
+}
+
+function modePhrase(mode=state.viewMode){
+  return mode==='day' ? 'del día' : mode==='week' ? 'de la semana' : 'del rango';
+}
+
+function dateLabelAt(index){
+  return state.data?.daily?.[clampIndex(index)]?.fecha_label || '-';
+}
+
+function weekStartIndex(index){
+  const row = state.data?.daily?.[clampIndex(index)];
+  if(!row?.fecha) return clampIndex(index);
+  const date = new Date(`${row.fecha}T12:00:00`);
+  const offset = (date.getDay()+6)%7; // lunes = 0
+  date.setDate(date.getDate()-offset);
+  const startIso = date.toISOString().slice(0,10);
+  const found=state.data.daily.findIndex((item,i)=>
+    i<=index && item.fecha>=startIso && item.fecha<=row.fecha
+  );
+  return found>=0 ? found : 0;
+}
+
+function periodBoundsForMode(mode,anchorIndex,rangeStart=null,rangeEnd=null){
+  const anchor = clampIndex(anchorIndex);
+  if(mode==='day'){
+    return {start:anchor,end:anchor,chartStart:Math.max(0,anchor-29),chartEnd:anchor};
+  }
+  if(mode==='week'){
+    const start = weekStartIndex(anchor);
+    return {start,end:anchor,chartStart:Math.max(0,start-56),chartEnd:anchor};
+  }
+  const start = clampIndex(rangeStart===null ? state.visibleStart : rangeStart);
+  const end = clampIndex(rangeEnd===null ? state.visibleEnd : rangeEnd);
+  return {
+    start:Math.min(start,end),
+    end:Math.max(start,end),
+    chartStart:Math.min(start,end),
+    chartEnd:Math.max(start,end)
+  };
+}
+
+function applyPeriodBounds(bounds){
+  state.visibleStart = clampIndex(bounds.start);
+  state.visibleEnd = clampIndex(bounds.end);
+  state.chartStart = clampIndex(bounds.chartStart ?? bounds.start);
+  state.chartEnd = clampIndex(bounds.chartEnd ?? bounds.end);
+}
+
+function selectedHousePeriodRows(){
+  if(!state.data?.daily?.length) return [];
+  return state.data.daily.slice(state.visibleStart,state.visibleEnd+1);
+}
+
+function selectedHouseWeeklyRows(endDate=null){
+  if(!state.data?.daily?.length) return [];
+  const cut = endDate || state.data.daily[state.visibleEnd]?.fecha;
+  const groups = new Map();
+  state.data.daily.forEach(row=>{
+    if(!row.fecha || row.fecha>cut) return;
+    const key = String(row.semana ?? 'sin_semana');
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(row);
+  });
+  return [...groups.values()].map(rows=>{
+    const first=rows[0], last=rows[rows.length-1];
+    const sum=key=>rows.reduce((acc,row)=>acc+numberOrZero(row[key]),0);
+    return {
+      semana:first.semana,
+      fecha_inicio:first.fecha,
+      fecha_fin:last.fecha,
+      etiqueta:`Sem. ${first.semana} · ${first.fecha_label}–${last.fecha_label}${rows.length<7?' (parcial)':''}`,
+      consumo_real:sum('consumo_real'),
+      consumo_estandar:sum('consumo_estandar'),
+      produccion_real:sum('produccion_real'),
+      produccion_estandar:sum('produccion_estandar'),
+      ica_real:last.ica_principal,
+      ica_estandar:last.ica_estandar,
+      estado_ica:last.estado_ica,
+      dias:rows.length
+    };
+  });
+}
+
+function sharedRowsForCurrentPeriod(){
+  const startDate = state.data?.daily?.[state.visibleStart]?.fecha;
+  const endDate = state.data?.daily?.[state.visibleEnd]?.fecha;
+  const groupStart = state.group?.meta?.fecha_inicio || startDate;
+  const groupEnd = state.group?.meta?.fecha_fin || endDate;
+  if(!startDate || !endDate) return [];
+  return (PAYLOAD.shared_store?.daily || []).filter(row=>
+    row.fecha>=startDate && row.fecha<=endDate &&
+    row.fecha>=groupStart && row.fecha<=groupEnd
+  );
+}
+
+function sumMapRows(rows,key,houses){
+  return Object.fromEntries(houses.map(house=>[
+    house,
+    rows.reduce((acc,row)=>acc+numberOrZero(row?.[key]?.[house]),0)
+  ]));
+}
+
+function aggregateGroupPeriod(){
+  const rows = sharedRowsForCurrentPeriod();
+  const houses = groupHouseIds();
+  if(!rows.length) return null;
+  const first = rows[0];
+  const last = rows[rows.length-1];
+  const sum = key=>rows.reduce((acc,row)=>acc+numberOrZero(row[key]),0);
+  const lastDetailMap = Object.fromEntries(houses.map(house=>[
+    house,last.casetas_detalle?.[house] || {}
+  ]));
+  const consumptionByHouse = sumMapRows(rows,'consumo_por_caseta',houses);
+  const productionByHouse = sumMapRows(rows,'produccion_por_caseta',houses);
+  const mortalityByHouse = sumMapRows(rows,'mortalidad_dia_por_caseta',houses);
+  const birdsByHouse = Object.fromEntries(houses.map(house=>[
+    house,last.aves_por_caseta?.[house]
+  ]));
+  const consumptionAccumulated = Object.fromEntries(houses.map(house=>[
+    house,lastDetailMap[house]?.consumo_acum
+  ]));
+  const productionAccumulated = Object.fromEntries(houses.map(house=>[
+    house,lastDetailMap[house]?.produccion_acum
+  ]));
+  const mortalityAccumulated = Object.fromEntries(houses.map(house=>[
+    house,last.mortalidad_acum_por_caseta?.[house]
+  ]));
+  const entries = sum('entradas');
+  const warehouseConsumption = sum('consumo_global');
+  const otherNet = rows.reduce((acc,row)=>
+    acc + numberOrZero(row.movimiento_stock_total)
+      - numberOrZero(row.entradas)
+      + numberOrZero(row.consumo_global),0);
+  const opening = numberOrZero(first.stock_apertura);
+  const close = Number(last.stock);
+  const expectedClose = opening + entries - warehouseConsumption + otherNet;
+  return {
+    rows,first,last,houses,lastDetailMap,
+    startLabel:first.fecha_label || first.fecha,
+    endLabel:last.fecha_label || last.fecha,
+    rangeLabel:first.fecha===last.fecha
+      ? (last.fecha_label || last.fecha)
+      : `${first.fecha_label || first.fecha} - ${last.fecha_label || last.fecha}`,
+    birdsByHouse,consumptionByHouse,productionByHouse,mortalityByHouse,
+    consumptionAccumulated,productionAccumulated,mortalityAccumulated,
+    entries,warehouseConsumption,otherNet,opening,close,expectedClose,
+    stockDifference:Number.isFinite(close) ? close-expectedClose : null,
+    traspasos:sum('traspasos'),ajustes:sum('ajustes'),
+    logistica:sum('logistica'),mermas:sum('mermas')
+  };
+}
+
+function aggregateWarehouseBucket(rows,label){
+  const houses = groupHouseIds();
+  const phases = PAYLOAD.shared_store?.phases || [];
+  const first=rows[0], last=rows[rows.length-1];
+  const sum=key=>rows.reduce((acc,row)=>acc+numberOrZero(row[key]),0);
+  const consumptionByHouse=sumMapRows(rows,'consumo_por_caseta',houses);
+  const phaseMap=Object.fromEntries(houses.map(house=>[
+    house,Object.fromEntries(phases.map(phase=>[
+      phase,rows.reduce((acc,row)=>acc+numberOrZero(row.consumo_por_caseta_fase?.[house]?.[phase]),0)
+    ]))
+  ]));
+  return {
+    fecha_inicio:first.fecha,fecha_fin:last.fecha,
+    etiqueta:label || (first.fecha===last.fecha
+      ? (last.fecha_label || last.fecha)
+      : `${first.fecha_label || first.fecha}–${last.fecha_label || last.fecha}`),
+    stock_apertura:first.stock_apertura,stock:last.stock,
+    entradas:sum('entradas'),traspasos:sum('traspasos'),
+    ajustes:sum('ajustes'),logistica:sum('logistica'),mermas:sum('mermas'),
+    consumo_global:sum('consumo_global'),
+    consumo_por_caseta:consumptionByHouse,
+    consumo_por_caseta_fase:phaseMap
+  };
+}
+
+function buildWarehouseBucketsFromDaily(rows){
+  if(!rows.length) return [];
+  if(state.viewMode==='day') return [aggregateWarehouseBucket(rows,rows[0].fecha_label || rows[0].fecha)];
+  if(state.viewMode==='week'){
+    return [aggregateWarehouseBucket(rows,`Semana parcial · ${rows[0].fecha_label}–${rows[rows.length-1].fecha_label}`)];
+  }
+  const groups=[];
+  let current=[];
+  let currentKey=null;
+  rows.forEach(row=>{
+    const date=new Date(`${row.fecha}T12:00:00`);
+    const offset=(date.getDay()+6)%7;
+    date.setDate(date.getDate()-offset);
+    const key=date.toISOString().slice(0,10);
+    if(currentKey!==null && key!==currentKey){groups.push(current);current=[];}
+    currentKey=key;
+    current.push(row);
+  });
+  if(current.length) groups.push(current);
+  return groups.map(group=>aggregateWarehouseBucket(group));
+}
+
+function updateTemporalText(){
+  const mode=state.viewMode;
+  const startLabel=dateLabelAt(state.visibleStart);
+  const endLabel=dateLabelAt(state.visibleEnd);
+  const partial=mode==='week' ? ' Semana parcial desde el lunes hasta la fecha de corte; no incluye días futuros.' : '';
+  el('temporalScope').textContent = `Vista ${modeLabel(mode)} · periodo calculado: ${startLabel}${state.visibleStart===state.visibleEnd?'':` - ${endLabel}`}.${partial}`;
+  el('prevDay').textContent = mode==='week' ? '◀ Semana' : '◀ Día';
+  el('nextDay').textContent = mode==='week' ? 'Semana ▶' : 'Día ▶';
+  el('groupKpiAvesLabel').textContent='Aves disponibles al cierre';
+  el('groupKpiStockLabel').textContent='Stock global al cierre';
+  el('groupKpiConsumoLabel').textContent=`Consumo de casetas ${modePhrase(mode)}`;
+  el('groupKpiEntradasLabel').textContent=`Entradas / reabastos ${modePhrase(mode)}`;
+  el('groupKpiProduccionLabel').textContent=`Producción total ${modePhrase(mode)}`;
+  el('groupKpiMortalidadLabel').textContent=`Mortalidad total ${modePhrase(mode)}`;
+  el('detailKpiProduccionPeriodoLabel').textContent=`Producción ${modePhrase(mode)} de la caseta`;
+  el('detailKpiConsumoPeriodoLabel').textContent=`Consumo ${modePhrase(mode)} de la caseta`;
+  el('detailKpiMortalidadPeriodoLabel').textContent=`Mortalidad ${modePhrase(mode)} de la caseta`;
+  el('groupHouseSubtitle').textContent=`Cada tarjeta muestra el valor ${modePhrase(mode)} y el acumulado de su ciclo al cierre del periodo.`;
+  el('warehouseGlobalTitle').textContent=`Stock global, entradas y consumo por caseta · vista ${modeLabel(mode)}`;
+  el('warehouseGlobalNote').textContent=mode==='week'
+    ? 'La semana actual se agrega únicamente hasta la fecha de corte. El stock corresponde al último día visible.'
+    : 'El stock pertenece al almacén común; el consumo se desglosa por caseta dentro del periodo calculado.';
+}
+
+function renderGroupHeader(){
+  const meta = state.group?.meta || {};
+  const houses = groupHouseIds();
+  const period = [meta.fecha_inicio,meta.fecha_fin].filter(Boolean).join(' - ');
+  const integrity = meta.grupo_completo
+    ? `Completo: ${houses.length} casetas`
+    : `Incompleto: faltan ${(meta.casetas_faltantes || []).join(', ') || '-'}`;
+
+  el('metaCentro').textContent = meta.centro || '-';
+  if(el('metaGranja')) el('metaGranja').textContent = meta.granja || 'CHENCOPO 2';
+  el('metaCaseta').textContent = meta.label || state.groupId || '-';
+  el('metaEstado').textContent = meta.estado || '-';
+  el('metaLote').textContent = houses.join(', ') || '-';
+  el('metaOrden').textContent = period || '-';
+  el('metaInicio').textContent = integrity;
+  el('standardSource').textContent = `Estándar: ${meta.fuente_estandar || '-'}`;
+}
+
+function sparklinePath(values,width=300,height=52){
+  const clean=values.map(v=>Number.isFinite(Number(v))?Number(v):0);
+  if(!clean.length)return '';
+  const min=Math.min(...clean),max=Math.max(...clean),span=Math.abs(max-min)<1e-9?1:max-min;
+  return clean.map((v,i)=>{
+    const x=clean.length===1?0:(i/(clean.length-1))*width;
+    const y=height-4-((v-min)/span)*(height-8);
+    return `${i===0?'M':'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(' ');
+}
+
+function houseOperationalState(detail,consumption,expectedConsumption,production,expectedProduction){
+  const severity=String(detail?.severidad_anomalia||'').toLowerCase();
+  if(detail?.es_anomalia && (severity==='critica'||severity==='alta')) return {label:'Crítico',className:'critical'};
+  if(detail?.es_anomalia || severity==='media') return {label:'Preventivo',className:'preventive'};
+  if(expectedConsumption>0 && Math.abs(consumption-expectedConsumption)/expectedConsumption>.20) return {label:'Preventivo',className:'preventive'};
+  if(expectedProduction>0 && production<expectedProduction*.80) return {label:'Preventivo',className:'preventive'};
+  return {label:'Normal',className:''};
+}
+
+function renderGroupHouseCards(summary){
+  const container=el('groupHouseCards');
+  if(!container)return;
+  const houses=groupHouseIds();
+  if(!summary){container.innerHTML='<div class="group-house-card">No hay datos para la fecha seleccionada.</div>';return;}
+  const fullRows=groupSharedRowsFull();
+  const cursorDate=summary.last?.fecha;
+  container.innerHTML=houses.map(house=>{
+    const groupHouse=state.group?.casetas?.[house]||{};
+    const detail=summary.lastDetailMap?.[house]||{};
+    const order=detail.orden||groupHouse.orden||'-';
+    const lot=detail.lote||groupHouse.lote||'-';
+    const birds=numberOrZero(summary.birdsByHouse?.[house]);
+    const mortality=numberOrZero(summary.mortalityByHouse?.[house]);
+    const mortalityAccum=numberOrZero(summary.mortalityAccumulated?.[house]);
+    const consumption=numberOrZero(summary.consumptionByHouse?.[house]);
+    const consumptionAccum=numberOrZero(summary.consumptionAccumulated?.[house]);
+    const production=numberOrZero(summary.productionByHouse?.[house]);
+    const productionAccum=numberOrZero(summary.productionAccumulated?.[house]);
+    const expectedConsumption=numberOrZero(detail.consumo_estandar);
+    const expectedProduction=numberOrZero(detail.produccion_estandar);
+    const gramsPerBird=birds>0?consumption*1000/birds:null;
+    const mortalityPct=birds+mortality>0?mortality/(birds+mortality)*100:null;
+    const productionCompliance=expectedProduction>0?production/expectedProduction*100:null;
+    const stateInfo=houseOperationalState(detail,consumption,expectedConsumption,production,expectedProduction);
+    const recent=fullRows.filter(r=>r.fecha<=cursorDate).slice(-14);
+    const prodPath=sparklinePath(recent.map(r=>numberOrZero(r.produccion_por_caseta?.[house])));
+    const consPath=sparklinePath(recent.map(r=>numberOrZero(r.consumo_por_caseta?.[house])));
+    const eggBreakdown='El payload actual no contiene clasificación por tipo de huevo; no se muestran valores simulados.';
+    return `<article class="group-house-card">
+      <div class="house-card-head"><div><div class="house-card-title">Caseta ${house}</div><div class="house-card-id">Orden ${order}<br>Lote ${lot} · Semana ${detail.semana??'-'} · ${detail.fase||'Sin fase'}</div></div><span class="house-badge ${stateInfo.className}">${stateInfo.label}</span></div>
+      <div class="house-sections">
+        <section class="house-section"><h4>Aves y consumo</h4><div class="house-metric-grid">
+          <div class="house-metric"><span>Aves disponibles</span><b>${fmtAuto(birds)}</b><small>Saldo al cierre</small></div>
+          <div class="house-metric"><span>Mortalidad del día</span><b>${fmtAuto(mortality)}</b><small>${mortalityPct===null?'-':fmt(mortalityPct,2)+'%'}</small></div>
+          <div class="house-metric"><span>Mortalidad acumulada</span><b>${fmtAuto(mortalityAccum)}</b><small>Ciclo productivo</small></div>
+          <div class="house-metric"><span>Consumo del día</span><b>${fmtAuto(consumption)} kg</b><small>Esperado ${fmtAuto(expectedConsumption)} kg</small></div>
+          <div class="house-metric"><span>Consumo acumulado</span><b>${fmtAuto(consumptionAccum)} kg</b><small>Desde inicio</small></div>
+          <div class="house-metric"><span>Gramos por ave</span><b>${gramsPerBird===null?'-':fmt(gramsPerBird,1)}</b><small>Diferencia ${expectedConsumption>0?fmtAuto(consumption-expectedConsumption)+' kg':'sin estándar'}</small></div>
+        </div></section>
+        <section class="house-section"><h4>Producción e ICA</h4><div class="house-metric-grid">
+          <div class="house-metric"><span>Producción del día</span><b>${fmtAuto(production)} kg</b><small>Esperada ${fmtAuto(expectedProduction)} kg</small></div>
+          <div class="house-metric"><span>Producción acumulada</span><b>${fmtAuto(productionAccum)} kg</b><small>Ciclo productivo</small></div>
+          <div class="house-metric"><span>Cumplimiento vs estándar</span><b>${productionCompliance===null?'-':fmt(productionCompliance,1)+'%'}</b><small>Dif. ${fmtAuto(production-expectedProduction)} kg</small></div>
+          <div class="house-metric"><span>ICA real / esperado</span><b>${fmtAuto(detail.ica_principal)} / ${fmtAuto(detail.ica_estandar)}</b><small>${detail.estado_ica||'No evaluable'}</small></div>
+        </div>
+        <svg class="house-spark" viewBox="0 0 300 52" preserveAspectRatio="none" aria-label="Tendencia reciente"><path d="${consPath}" fill="none" stroke="#1A428A" stroke-width="2" opacity=".55"/><path d="${prodPath}" fill="none" stroke="#00B2E3" stroke-width="3"/></svg>
+        <details class="house-detail"><summary>Datos secundarios y disponibilidad del desglose</summary><p>Consumo acumulado: ${fmtAuto(consumptionAccum)} kg. Producción acumulada: ${fmtAuto(productionAccum)} kg. ${eggBreakdown}</p></details>
+        </section>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function updateGroupSummary(){
+  const summary = aggregateGroupPeriod();
+  const houses = groupHouseIds();
+  el('groupKpiDate').textContent = summary
+    ? `Vista ${modeLabel()} · ${summary.rangeLabel}`
+    : `Vista ${modeLabel()} · sin datos`;
+  if(!summary){
+    ['groupKpiAves','groupKpiStock','groupKpiConsumo','groupKpiEntradas','groupKpiProduccion','groupKpiMortalidad'].forEach(id=>el(id).textContent='-');
+    ['groupKpiAvesFormula','groupKpiStockFormula','groupKpiConsumoFormula','groupKpiEntradasFormula','groupKpiProduccionFormula','groupKpiMortalidadFormula'].forEach(id=>el(id).textContent='Sin datos globales para el periodo.');
+    renderGroupHouseCards(null);
+    return;
+  }
+  const birds=formulaFromMap(houses,summary.birdsByHouse,'aves',false);
+  const consumption=formulaFromMap(houses,summary.consumptionByHouse,'kg',true);
+  const consumptionAccumulated=formulaFromMap(houses,summary.consumptionAccumulated,'kg',false);
+  const production=formulaFromMap(houses,summary.productionByHouse,'kg',true);
+  const productionAccumulated=formulaFromMap(houses,summary.productionAccumulated,'kg',false);
+  const mortality=formulaFromMap(houses,summary.mortalityByHouse,'aves',true);
+  const mortalityAccumulated=formulaFromMap(houses,summary.mortalityAccumulated,'aves',false);
+
+  el('groupKpiAves').textContent=`${fmtAuto(birds.total)} aves`;
+  el('groupKpiAvesFormula').innerHTML=`<strong>Al cierre:</strong> ${birds.text}`;
+
+  el('groupKpiConsumo').textContent=`${fmtAuto(consumption.total)} kg`;
+  const consumptionFormula=el('groupKpiConsumoFormula');
+  const difference=consumption.total-summary.warehouseConsumption;
+  consumptionFormula.classList.toggle('warning',Math.abs(difference)>0.01);
+  consumptionFormula.classList.toggle('ok',Math.abs(difference)<=0.01);
+  consumptionFormula.innerHTML=Math.abs(difference)<=0.01
+    ? `<strong>${modeLabel()} conciliado:</strong> ${consumption.text}<br><strong>Acumulado al cierre:</strong> ${consumptionAccumulated.text}`
+    : `<strong>Suma casetas:</strong> ${consumption.text}<br><strong>Salida del almacén:</strong> ${fmtAuto(summary.warehouseConsumption)} kg · diferencia ${difference>=0?'+':''}${fmtAuto(difference)} kg<br><strong>Acumulado al cierre:</strong> ${consumptionAccumulated.text}`;
+
+  el('groupKpiProduccion').textContent=`${fmtAuto(production.total)} kg`;
+  el('groupKpiProduccionFormula').innerHTML=`<strong>${modeLabel()}:</strong> ${production.text}<br><strong>Acumulado al cierre:</strong> ${productionAccumulated.text}`;
+
+  el('groupKpiMortalidad').textContent=`${fmtAuto(mortality.total)} aves`;
+  el('groupKpiMortalidadFormula').innerHTML=`<strong>${modeLabel()}:</strong> ${mortality.text}<br><strong>Acumulado al cierre:</strong> ${mortalityAccumulated.text}`;
+
+  el('groupKpiStock').textContent=Number.isFinite(summary.close)?`${fmtAuto(summary.close)} kg`:'-';
+  const stockFormula=el('groupKpiStockFormula');
+  const stockOk=summary.stockDifference===null||Math.abs(summary.stockDifference)<=0.01;
+  stockFormula.classList.toggle('warning',!stockOk);
+  stockFormula.classList.toggle('ok',stockOk);
+  stockFormula.innerHTML=`<strong>Apertura + entradas - consumo almacén + otros netos:</strong><br>${fmtAuto(summary.opening)} + ${fmtAuto(summary.entries)} - ${fmtAuto(summary.warehouseConsumption)} ${summary.otherNet>=0?'+':'-'} ${fmtAuto(Math.abs(summary.otherNet))} = ${Number.isFinite(summary.close)?fmtAuto(summary.close):'-'} kg${stockOk?'':` · diferencia ${fmtAuto(summary.stockDifference)} kg`}`;
+
+  el('groupKpiEntradas').textContent=`${fmtAuto(summary.entries)} kg`;
+  el('groupKpiEntradasFormula').innerHTML=summary.entries!==0
+    ? `<strong>Origen:</strong> almacén compartido · suma de reabastos ${modePhrase()}<br>No se suma por caseta.`
+    : `<strong>Origen:</strong> almacén compartido · sin reabasto ${modePhrase()}.<br>No se suma por caseta.`;
+  renderGroupHouseCards(summary);
+}
+
+function populateHouseSelector(preferredHouse=null){
+  const selector = el('houseSelect');
+  selector.innerHTML = '';
+  const houses = groupHouseIds();
+  houses.forEach(house=>{
+    const record = state.group?.casetas?.[house] || {};
+    const option = document.createElement('option');
+    option.value = house;
+    option.textContent = `Caseta ${house} · Orden ${record.orden || '-'} · Lote ${record.lote || '-'}`;
+    selector.appendChild(option);
+  });
+  const selected = preferredHouse && houses.includes(String(preferredHouse))
+    ? String(preferredHouse)
+    : houses[0];
+  if(selected) selector.value = selected;
+  return selected || null;
+}
+
+function selectHouse(house,preserveTemporal=true){
+  const periodId=state.group?.period_id_por_caseta?.[String(house)];
+  if(!periodId)return;
+  stopPlayback();
+  state.houseId=String(house);
+  el('houseSelect').value=state.houseId;
+  renderPeriod(periodId,preserveTemporal);
+}
+
+function renderCycleGroup(groupId,preferredHouse=null){
+  const group=PAYLOAD.cycle_groups?.[groupId];
+  if(!group)return;
+  stopPlayback();
+  state.groupId=groupId;
+  state.group=group;
+  renderGroupHeader();
+  const selectedHouse=populateHouseSelector(preferredHouse);
+  if(selectedHouse)selectHouse(selectedHouse,false);
+}
+
 function destroyCharts(){
   Object.values(state.charts).forEach(item => {
     if(Array.isArray(item)){
@@ -1097,141 +1778,16 @@ function linearRegression(points){
 }
 
 function updateProgressiveCharts(){
-  const d = state.data.daily;
-  const end = state.index;
-
-
-  if(state.charts.production){
-    state.charts.production.data.datasets[0].data = revealSeries(d.map(r=>r.produccion_real),end);
-    state.charts.production.data.datasets[1].data = revealSeries(d.map(r=>r.produccion_estandar),end);
-    state.charts.production.update('none');
-  }
-
-  if(state.charts.consumption){
-    state.charts.consumption.data.datasets[0].data = revealSeries(d.map(r=>r.consumo_real),end);
-    state.charts.consumption.data.datasets[1].data = revealSeries(d.map(r=>r.consumo_estandar),end);
-    state.charts.consumption.update('none');
-  }
-
-  if(state.charts.stock){
-    state.charts.stock.data.datasets[0].data =
-      revealSeries(d.map(row => row.stock), end);
-
-    state.charts.stock.data.datasets[1].data =
-      revealSeries(d.map(row => row.entrada_alimento), end);
-
-    state.charts.stock.data.datasets[2].data =
-      revealSeries(d.map(row => row.traspasos_internos), end);
-
-    state.charts.stock.data.datasets[3].data =
-      revealSeries(
-        d.map(row =>
-          Number(row.ajustes_inventario || 0) +
-          Number(row.ajustes_511_512 || 0)
-        ),
-        end
-      );
-
-    state.charts.stock.data.datasets[4].data =
-      revealSeries(
-        d.map(row =>
-          Number(row.movimientos_logisticos || 0) +
-          Number(row.traslados_641_643 || 0)
-        ),
-        end
-      );
-
-    state.charts.stock.data.datasets[5].data =
-      revealSeries(
-        d.map(row => -Math.abs(Number(row.mermas_551_552 || 0))),
-        end
-      );
-
-    state.charts.stock.data.datasets[6].data =
-      revealSeries(
-        d.map(row => -Math.abs(Number(row.consumo_real || 0))),
-        end
-      );
-
-    state.charts.stock.update('none');
-
-    const currentRow = d[end];
-    if(currentRow){
-      const ajustes =
-        Number(currentRow.ajustes_inventario || 0) +
-        Number(currentRow.ajustes_511_512 || 0);
-
-      const logistica =
-        Number(currentRow.movimientos_logisticos || 0) +
-        Number(currentRow.traslados_641_643 || 0);
-
-      el('stockInsight').textContent =
-        `Stock al cierre: ${fmtAuto(currentRow.stock)} kg. ` +
-        `Entradas: ${fmtAuto(currentRow.entrada_alimento)} kg; ` +
-        `consumo: ${fmtAuto(currentRow.consumo_real)} kg; ` +
-        `traspasos: ${fmtAuto(currentRow.traspasos_internos)} kg; ` +
-        `ajustes: ${fmtAuto(ajustes)} kg; ` +
-        `logística: ${fmtAuto(logistica)} kg; ` +
-        `mermas: ${fmtAuto(Math.abs(Number(currentRow.mermas_551_552 || 0)))} kg.`;
-    }
-  }
-
-  if(state.charts.birds){
-    state.charts.birds.data.datasets[0].data = revealSeries(d.map(r=>r.aves),end);
-    state.charts.birds.data.datasets[1].data = revealSeries(d.map(r=>r.mortalidad_acum),end);
-    state.charts.birds.update('none');
-  }
-
-  if(state.charts.ica){
-    const weekEnd = currentWeekPosition();
-    const w = state.data.weekly;
-    state.charts.ica.data.datasets[0].data = revealSeries(w.map(r=>r.ica_real),weekEnd);
-    state.charts.ica.data.datasets[1].data = revealSeries(w.map(r=>r.ica_estandar),weekEnd);
-    state.charts.ica.update('none');
-  }
-
-  if(state.charts.movements){
-    const totals = movementTotals(end);
-    state.charts.movements.data.datasets[0].data = [
-      totals.entradas,totals.consumo,totals.traspasos,
-      totals.ajustes,totals.logistica,totals.mermas
-    ];
-    state.charts.movements.update('none');
-    updateMovementCards(totals);
-  }
-
-  if(state.charts.productionConsumption){
-    state.charts.productionConsumption.data.datasets[0].data =
-      revealSeries(d.map(r=>r.produccion_real),end);
-    state.charts.productionConsumption.data.datasets[1].data =
-      revealSeries(d.map(r=>r.consumo_real),end);
-    state.charts.productionConsumption.update('none');
-
-    const visible = d.slice(0,end+1);
-    const totalProd = visible.reduce((a,r)=>a+Number(r.produccion_real||0),0);
-    const totalCons = visible.reduce((a,r)=>a+Number(r.consumo_real||0),0);
-    el('productionConsumptionInsight').textContent = totalProd > 0
-      ? `Hasta la fecha seleccionada se acumulan ${fmtAuto(totalCons)} kg de consumo y ${fmtAuto(totalProd)} kg de producción.`
-      : `Se acumulan ${fmtAuto(totalCons)} kg de consumo; la producción aún no inicia.`;
-  }
-
-  if(state.charts.warehouseGlobal || state.charts.phaseCasetas?.length){
-    updateWarehousePhaseCharts(end);
-  }
-
-  if(state.charts.scatter){
-    const points = state.data.scatter.filter(p=>{
-      const idx = d.findIndex(r=>r.fecha_label===p.fecha || r.fecha===p.fecha);
-      return idx >= state.visibleStart && idx <= Math.min(end,state.visibleEnd);
-    });
-    const reg = linearRegression(points);
-    state.charts.scatter.data.datasets[0].data = points;
-    state.charts.scatter.data.datasets[1].data = reg.line;
-    state.charts.scatter.update('none');
-    el('scatterInsight').textContent = reg.r2 === null
-      ? 'Aún no hay suficientes observaciones para calcular una relación lineal.'
-      : `Con los datos visibles hasta la fecha seleccionada, R² = ${fmt(reg.r2,3)}.`;
-  }
+  const rows=groupSharedRowsFull(),houses=groupHouseIds(),end=groupCursorIndex(rows);
+  if(state.charts.production){houses.forEach((house,i)=>{if(state.charts.production.data.datasets[i])state.charts.production.data.datasets[i].data=revealSeries(houseSeries(rows,'produccion_por_caseta',house),end);});const expectedIndex=houses.length;if(state.charts.production.data.datasets[expectedIndex])state.charts.production.data.datasets[expectedIndex].data=revealSeries(totalDetailSeries(rows,'produccion_estandar',houses),end);state.charts.production.update('none');}
+  if(state.charts.consumption){houses.forEach((house,i)=>{if(state.charts.consumption.data.datasets[i])state.charts.consumption.data.datasets[i].data=revealSeries(houseSeries(rows,'consumo_por_caseta',house),end);});if(state.charts.consumption.data.datasets[houses.length])state.charts.consumption.data.datasets[houses.length].data=revealSeries(rows.map(r=>numberOrZero(r.consumo_global)),end);if(state.charts.consumption.data.datasets[houses.length+1])state.charts.consumption.data.datasets[houses.length+1].data=revealSeries(totalDetailSeries(rows,'consumo_estandar',houses),end);state.charts.consumption.update('none');}
+  const d=state.data.daily;
+  if(state.charts.stock){state.charts.stock.data.datasets[0].data=revealSeries(d.map(row=>row.stock),state.index);state.charts.stock.data.datasets[1].data=revealSeries(d.map(row=>row.entrada_alimento),state.index);state.charts.stock.data.datasets[2].data=revealSeries(d.map(row=>row.traspasos_internos),state.index);state.charts.stock.data.datasets[3].data=revealSeries(d.map(row=>numberOrZero(row.ajustes_inventario)+numberOrZero(row.ajustes_511_512)),state.index);state.charts.stock.data.datasets[4].data=revealSeries(d.map(row=>numberOrZero(row.movimientos_logisticos)+numberOrZero(row.traslados_641_643)),state.index);state.charts.stock.data.datasets[5].data=revealSeries(d.map(row=>-Math.abs(numberOrZero(row.mermas_551_552))),state.index);state.charts.stock.data.datasets[6].data=revealSeries(d.map(row=>-Math.abs(numberOrZero(sharedDayForDate(row.fecha)?.consumo_global))),state.index);state.charts.stock.update('none');}
+  if(state.charts.birds){houses.forEach((house,i)=>{if(state.charts.birds.data.datasets[i])state.charts.birds.data.datasets[i].data=revealSeries(houseSeries(rows,'aves_por_caseta',house),end);});if(state.charts.birds.data.datasets[houses.length])state.charts.birds.data.datasets[houses.length].data=revealSeries(rows.map(row=>houses.reduce((acc,h)=>acc+numberOrZero(row.mortalidad_acum_por_caseta?.[h]),0)),end);state.charts.birds.update('none');}
+  if(state.charts.movements){const totals=movementTotals();state.charts.movements.data.datasets[0].data=[totals.entradas,totals.consumo,totals.traspasos,totals.ajustes,totals.logistica,totals.mermas];state.charts.movements.update('none');updateMovementCards(totals);}
+  if(state.charts.productionConsumption){state.charts.productionConsumption.data.datasets[0].data=revealSeries(totalMapSeries(rows,'produccion_por_caseta',houses),end);state.charts.productionConsumption.data.datasets[1].data=revealSeries(rows.map(r=>numberOrZero(r.consumo_global)),end);state.charts.productionConsumption.update('none');const visible=rows.filter(r=>r.fecha>=state.data.daily[state.visibleStart]?.fecha&&r.fecha<=state.data.daily[state.visibleEnd]?.fecha);const totalProd=visible.reduce((a,r)=>a+houses.reduce((s,h)=>s+numberOrZero(r.produccion_por_caseta?.[h]),0),0);const totalCons=visible.reduce((a,r)=>a+numberOrZero(r.consumo_global),0);el('productionConsumptionInsight').textContent=totalProd>0?`En el día se registran ${fmtAuto(totalCons)} kg de consumo global y ${fmtAuto(totalProd)} kg de producción total.`:`Se registran ${fmtAuto(totalCons)} kg de consumo global; la producción total aún no inicia.`;}
+  if(state.charts.warehouseGlobal||state.charts.phaseCasetas?.length)updateWarehousePhaseCharts();
+  if(state.charts.scatter){const cursorDate=state.data.daily[state.index]?.fecha;const visible=rows.filter(r=>r.fecha<=cursorDate);const points=visible.map(r=>({x:numberOrZero(r.consumo_global),y:houses.reduce((a,h)=>a+numberOrZero(r.produccion_por_caseta?.[h]),0),fecha:r.fecha}));const reg=linearRegression(points);state.charts.scatter.data.datasets[0].data=points;state.charts.scatter.data.datasets[1].data=reg.line;state.charts.scatter.update('none');el('scatterInsight').textContent=reg.r2===null?'Aún no hay suficientes observaciones para calcular una relación lineal.':`Con datos globales visibles hasta la fecha, R² = ${fmt(reg.r2,3)}.`;}
 }
 
 function renderNotionTimeline(){
@@ -1351,34 +1907,40 @@ function renderNotionTimeline(){
 }
 
 
+
+function groupSharedRowsFull(){
+  const start=state.group?.meta?.fecha_inicio||'';
+  const end=state.group?.meta?.fecha_fin||'9999-12-31';
+  return (PAYLOAD.shared_store?.daily||[]).filter(row=>row.fecha>=start&&row.fecha<=end);
+}
+function groupCursorIndex(rows=groupSharedRowsFull()){
+  const cursorDate=state.data?.daily?.[state.index]?.fecha;
+  let idx=rows.findIndex(row=>row.fecha===cursorDate);
+  if(idx>=0)return idx;
+  idx=rows.findLastIndex?rows.findLastIndex(row=>row.fecha<=cursorDate):rows.reduce((best,row,i)=>row.fecha<=cursorDate?i:best,-1);
+  return Math.max(0,idx);
+}
+function houseSeries(rows,key,house){return rows.map(row=>numberOrZero(row?.[key]?.[house]));}
+function detailSeries(rows,house,key){return rows.map(row=>numberOrZero(row?.casetas_detalle?.[house]?.[key]));}
+function totalMapSeries(rows,key,houses=groupHouseIds()){return rows.map(row=>houses.reduce((acc,house)=>acc+numberOrZero(row?.[key]?.[house]),0));}
+function totalDetailSeries(rows,key,houses=groupHouseIds()){return rows.map(row=>houses.reduce((acc,house)=>acc+numberOrZero(row?.casetas_detalle?.[house]?.[key]),0));}
+function chartHouseColors(){return [COLORS.blueDark,COLORS.blueLight,COLORS.greenDark];}
+
 function createProductionChart(){
-  const d = state.data.daily;
-  const labels = d.map(r => r.fecha_label);
-  const options = commonOptions();
-  options.scales.y = {beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Producción kg'}};
-  state.charts.production = new Chart(el('productionChart'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Producción real',data:revealSeries(d.map(r=>r.produccion_real),state.index),borderColor:COLORS.blueLight,backgroundColor:'rgba(0,178,227,.12)',fill:true,tension:.25,pointRadius:2},
-      {label:'Producción esperada',data:revealSeries(d.map(r=>r.produccion_estandar),state.index),borderColor:COLORS.greenLight,backgroundColor:COLORS.greenLight,borderDash:[7,5],tension:.25,pointRadius:0}
-    ]},options
-  });
-  attachDoubleClickZoom(state.charts.production);
+  const rows=groupSharedRowsFull(),houses=groupHouseIds(),labels=rows.map(r=>r.fecha_label||r.fecha),end=groupCursorIndex(rows),colors=chartHouseColors();
+  const options=commonOptions();options.scales.y={beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Producción kg'}};
+  const datasets=houses.map((house,i)=>({label:`Caseta ${house}`,data:revealSeries(houseSeries(rows,'produccion_por_caseta',house),end),borderColor:colors[i],backgroundColor:colors[i],tension:.22,pointRadius:0,borderWidth:2}));
+  datasets.push({label:'Total esperado',data:revealSeries(totalDetailSeries(rows,'produccion_estandar',houses),end),borderColor:COLORS.greenLight,backgroundColor:COLORS.greenLight,borderDash:[7,5],tension:.22,pointRadius:0,borderWidth:2.5});
+  state.charts.production=new Chart(el('productionChart'),{type:'line',data:{labels,datasets},options});attachDoubleClickZoom(state.charts.production);
 }
 
 function createConsumptionChart(){
-  const d = state.data.daily;
-  const labels = d.map(r => r.fecha_label);
-  const options = commonOptions();
-  options.scales.y = {beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Consumo kg'}};
-  state.charts.consumption = new Chart(el('consumptionChart'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Consumo real',data:revealSeries(d.map(r=>r.consumo_real),state.index),borderColor:COLORS.blueDark,backgroundColor:'rgba(31,69,143,.10)',fill:true,tension:.20,pointRadius:0,borderWidth:2},
-      {label:'Consumo esperado',data:revealSeries(d.map(r=>r.consumo_estandar),state.index),borderColor:COLORS.greenDark,backgroundColor:COLORS.greenDark,borderDash:[7,5],tension:.25,pointRadius:0}
-    ]},options
-  });
-  attachDoubleClickZoom(state.charts.consumption);
+  const rows=groupSharedRowsFull(),houses=groupHouseIds(),labels=rows.map(r=>r.fecha_label||r.fecha),end=groupCursorIndex(rows),colors=chartHouseColors();
+  const options=commonOptions();options.scales.y={beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Consumo kg'}};
+  const datasets=houses.map((house,i)=>({label:`Caseta ${house}`,data:revealSeries(houseSeries(rows,'consumo_por_caseta',house),end),borderColor:colors[i],backgroundColor:colors[i],tension:.20,pointRadius:0,borderWidth:2}));
+  datasets.push({label:'Consumo global almacén',data:revealSeries(rows.map(r=>numberOrZero(r.consumo_global)),end),borderColor:COLORS.red,backgroundColor:'transparent',borderDash:[4,4],tension:.18,pointRadius:0,borderWidth:2.4});
+  datasets.push({label:'Total esperado',data:revealSeries(totalDetailSeries(rows,'consumo_estandar',houses),end),borderColor:COLORS.greenLight,backgroundColor:COLORS.greenLight,borderDash:[8,5],tension:.22,pointRadius:0,borderWidth:2});
+  state.charts.consumption=new Chart(el('consumptionChart'),{type:'line',data:{labels,datasets},options});attachDoubleClickZoom(state.charts.consumption);
 }
 
 function createStockChart(){
@@ -1396,7 +1958,7 @@ function createStockChart(){
       {type:'bar',label:'Ajustes y 511/512',yAxisID:'yMov',data:revealSeries(d.map(r=>(Number(r.ajustes_inventario||0)+Number(r.ajustes_511_512||0))),state.index),backgroundColor:'rgba(31,69,143,.45)',borderColor:COLORS.blueDark,borderWidth:1,order:1},
       {type:'bar',label:'Logística WL / 641 / 643',yAxisID:'yMov',data:revealSeries(d.map(r=>(Number(r.movimientos_logisticos||0)+Number(r.traslados_641_643||0))),state.index),backgroundColor:'rgba(0,178,227,.45)',borderColor:COLORS.blueLight,borderWidth:1,order:1},
       {type:'bar',label:'Mermas 551/552',yAxisID:'yMov',data:revealSeries(d.map(r=>-Math.abs(Number(r.mermas_551_552||0))),state.index),backgroundColor:'rgba(220,0,20,.55)',borderColor:COLORS.red,borderWidth:1,order:1},
-      {type:'bar',label:'Consumo del día',yAxisID:'yMov',data:revealSeries(d.map(r=>-Math.abs(Number(r.consumo_real||0))),state.index),backgroundColor:'rgba(31,69,143,.18)',borderColor:COLORS.blueDark,borderWidth:1,order:1}
+      {type:'bar',label:'Consumo global del día',yAxisID:'yMov',data:revealSeries(d.map(r=>-Math.abs(Number(r.consumo_real||0))),state.index),backgroundColor:'rgba(31,69,143,.18)',borderColor:COLORS.blueDark,borderWidth:1,order:1}
     ]},
     options
   });
@@ -1404,75 +1966,42 @@ function createStockChart(){
 }
 
 function createScatterChart(){
-  const stats = state.data.regression_stats;
-  const options = commonOptions();
-  options.scales.x = {type:'linear',position:'bottom',beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Consumo diario kg'}};
-  options.scales.y = {beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Producción diaria kg'}};
-  options.plugins.tooltip.callbacks = {
-    label:(ctx)=>{
-      const raw = ctx.raw;
-      return raw.fecha ? `${raw.fecha}: ${fmtAuto(raw.x)} kg consumo, ${fmtAuto(raw.y)} kg producción` : `Tendencia: ${fmtAuto(raw.y)} kg`;
-    }
-  };
-
-  state.charts.scatter = new Chart(el('scatterChart'),{
-    type:'scatter',
-    data:{datasets:[
-      {label:'Días observados',data:[],backgroundColor:COLORS.blueLight,borderColor:COLORS.blueDark,pointRadius:5,pointHoverRadius:7},
-      {label:'Tendencia lineal',data:[],type:'line',borderColor:COLORS.red,borderWidth:2,pointRadius:0,fill:false}
-    ]},options
-  });
-
-  const r2 = stats.r2;
-  el('scatterInsight').textContent = r2 === null
-    ? 'No hay suficientes observaciones para calcular una relación lineal confiable.'
-    : `La relación lineal presenta R² = ${fmt(r2,3)}. Un valor cercano a 1 indica una asociación más consistente entre consumo y producción.`;
-  attachDoubleClickZoom(state.charts.scatter);
+  const rows=groupSharedRowsFull(),houses=groupHouseIds();
+  const options=commonOptions();options.scales.x={type:'linear',position:'bottom',beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Consumo global kg'}};options.scales.y={beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Producción total kg'}};
+  options.plugins.tooltip.callbacks={label:(ctx)=>{const raw=ctx.raw;return raw.fecha?`${raw.fecha}: ${fmtAuto(raw.x)} kg consumo, ${fmtAuto(raw.y)} kg producción`:`Tendencia: ${fmtAuto(raw.y)} kg`;}};
+  state.charts.scatter=new Chart(el('scatterChart'),{type:'scatter',data:{datasets:[{label:'Días observados',data:[],backgroundColor:COLORS.blueLight,borderColor:COLORS.blueDark,pointRadius:5,pointHoverRadius:7},{label:'Tendencia lineal',data:[],type:'line',borderColor:COLORS.red,borderWidth:2,pointRadius:0,fill:false}]},options});
+  el('scatterInsight').textContent='La relación se calcula con consumo global y producción total de las tres casetas.';attachDoubleClickZoom(state.charts.scatter);
 }
 
 function createIcaChart(){
-  const w = state.data.weekly;
-  const options = commonOptions();
-  options.scales.y.title = {display:true,text:'ICA'};
-  state.charts.ica = new Chart(el('icaChart'),{
-    type:'line',
-    data:{labels:w.map(r=>r.etiqueta),datasets:[
-      {label:'ICA real',data:revealSeries(w.map(r=>r.ica_real),currentWeekPosition()),borderColor:COLORS.red,backgroundColor:COLORS.red,tension:.2,pointRadius:4,spanGaps:true},
-      {label:'ICA esperado',data:revealSeries(w.map(r=>r.ica_estandar),currentWeekPosition()),borderColor:COLORS.greenDark,backgroundColor:COLORS.greenDark,borderDash:[6,4],tension:.2,pointRadius:3,spanGaps:true}
-    ]},options
-  });
-  attachDoubleClickZoom(state.charts.ica);
+  const houses=groupHouseIds(),colors=chartHouseColors();
+  const series=houses.map(house=>{const periodId=state.group?.period_id_por_caseta?.[house];return {house,rows:(PAYLOAD.periods?.[periodId]?.weekly||[])};});
+  const labels=[...new Set(series.flatMap(item=>item.rows.map(r=>r.etiqueta||`Semana ${r.semana}`)))];
+  const options=commonOptions();options.scales.y.title={display:true,text:'ICA'};
+  const datasets=series.map((item,i)=>({label:`ICA caseta ${item.house}`,data:labels.map(label=>item.rows.find(r=>(r.etiqueta||`Semana ${r.semana}`)===label)?.ica_real??null),borderColor:colors[i],backgroundColor:colors[i],tension:.2,pointRadius:3,spanGaps:true}));
+  const expected=labels.map(label=>{const vals=series.map(item=>item.rows.find(r=>(r.etiqueta||`Semana ${r.semana}`)===label)?.ica_estandar).filter(v=>v!==null&&v!==undefined&&Number.isFinite(Number(v))).map(Number);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;});
+  datasets.push({label:'ICA esperado promedio',data:expected,borderColor:COLORS.greenLight,backgroundColor:COLORS.greenLight,borderDash:[6,4],tension:.2,pointRadius:2,spanGaps:true});
+  state.charts.ica=new Chart(el('icaChart'),{type:'line',data:{labels,datasets},options});attachDoubleClickZoom(state.charts.ica);
 }
 
 function createBirdsChart(){
-  const d = state.data.daily;
-  const options = commonOptions();
-  options.scales.y = {position:'left',beginAtZero:false,grid:{color:COLORS.paleBlue},title:{display:true,text:'Aves disponibles'}};
-  options.scales.y1 = {position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'Mortalidad acumulada'}};
-  state.charts.birds = new Chart(el('birdsChart'),{
-    type:'line',
-    data:{labels:d.map(r=>r.fecha_label),datasets:[
-      {label:'Aves disponibles',data:revealSeries(d.map(r=>r.aves),state.index),borderColor:COLORS.blueDark,backgroundColor:COLORS.paleBlue,tension:.15,pointRadius:1,yAxisID:'y'},
-      {label:'Mortalidad acumulada',data:revealSeries(d.map(r=>r.mortalidad_acum),state.index),borderColor:COLORS.red,backgroundColor:COLORS.red,tension:.15,pointRadius:1,yAxisID:'y1'}
-    ]},options
-  });
-  attachDoubleClickZoom(state.charts.birds);
+  const rows=groupSharedRowsFull(),houses=groupHouseIds(),colors=chartHouseColors(),labels=rows.map(r=>r.fecha_label||r.fecha),end=groupCursorIndex(rows);
+  const options=commonOptions();options.scales.y={position:'left',beginAtZero:false,grid:{color:COLORS.paleBlue},title:{display:true,text:'Aves disponibles'}};options.scales.y1={position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'Mortalidad acumulada total'}};
+  const datasets=houses.map((house,i)=>({label:`Aves ${house}`,data:revealSeries(houseSeries(rows,'aves_por_caseta',house),end),borderColor:colors[i],backgroundColor:colors[i],tension:.15,pointRadius:0,yAxisID:'y',borderWidth:2}));
+  datasets.push({label:'Mortalidad acumulada total',data:revealSeries(rows.map(row=>houses.reduce((acc,h)=>acc+numberOrZero(row.mortalidad_acum_por_caseta?.[h]),0)),end),borderColor:COLORS.red,backgroundColor:COLORS.red,tension:.15,pointRadius:0,yAxisID:'y1',borderDash:[5,4]});
+  state.charts.birds=new Chart(el('birdsChart'),{type:'line',data:{labels,datasets},options});attachDoubleClickZoom(state.charts.birds);
 }
 
-function movementTotals(endIndex){
-  const rows = state.data.daily.slice(state.visibleStart,Math.min(endIndex,state.visibleEnd)+1);
-  const sumAbs = key => rows.reduce((acc,r)=>{
-    const value = Number(r[key]);
-    return acc + (Number.isFinite(value) ? Math.abs(value) : 0);
-  },0);
-
+function movementTotals(){
+  const rows=sharedRowsForCurrentPeriod();
+  const sumAbs=key=>rows.reduce((acc,row)=>acc+Math.abs(numberOrZero(row[key])),0);
   return {
-    entradas:sumAbs('entrada_alimento'),
-    consumo:sumAbs('consumo_real'),
-    traspasos:sumAbs('traspasos_internos'),
-    ajustes:sumAbs('ajustes_inventario') + sumAbs('ajustes_511_512'),
-    logistica:sumAbs('movimientos_logisticos') + sumAbs('traslados_641_643'),
-    mermas:sumAbs('mermas_551_552')
+    entradas:sumAbs('entradas'),
+    consumo:sumAbs('consumo_global'),
+    traspasos:sumAbs('traspasos'),
+    ajustes:sumAbs('ajustes'),
+    logistica:sumAbs('logistica'),
+    mermas:sumAbs('mermas')
   };
 }
 
@@ -1487,96 +2016,88 @@ function updateMovementCards(totals){
   const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
   const leader = sorted[0];
   el('movementInsight').textContent = leader && leader[1] > 0
-    ? `Hasta la fecha seleccionada, el mayor volumen corresponde a ${leader[0]} con ${fmtAuto(leader[1])} kg.`
+    ? `En el ${modeLabel()}, el mayor volumen corresponde a ${leader[0]} con ${fmtAuto(leader[1])} kg.`
     : 'Aún no hay movimientos acumulados para la fecha seleccionada.';
 }
 
 
 function createProductionConsumptionChart(){
-  const d = state.data.daily;
-  const options = commonOptions();
-
-  options.scales.y = {
-    position:'left',
-    beginAtZero:true,
-    grid:{color:COLORS.paleBlue},
-    title:{display:true,text:'Producción kg'}
-  };
-  options.scales.y1 = {
-    position:'right',
-    beginAtZero:true,
-    grid:{drawOnChartArea:false},
-    title:{display:true,text:'Consumo kg'}
-  };
-
-  state.charts.productionConsumption = new Chart(el('productionConsumptionChart'),{
-    type:'line',
-    data:{
-      labels:d.map(r=>r.fecha_label),
-      datasets:[
-        {
-          label:'Producción diaria',
-          data:revealSeries(d.map(r=>r.produccion_real),state.index),
-          borderColor:COLORS.blueLight,
-          backgroundColor:'rgba(0,178,227,.10)',
-          fill:true,
-          tension:.25,
-          pointRadius:1.5,
-          yAxisID:'y'
-        },
-        {
-          label:'Consumo diario',
-          data:revealSeries(d.map(r=>r.consumo_real),state.index),
-          borderColor:COLORS.greenDark,
-          backgroundColor:COLORS.greenDark,
-          tension:.18,
-          pointRadius:1.5,
-          yAxisID:'y1'
-        }
-      ]
-    },
-    options
-  });
-  attachDoubleClickZoom(state.charts.productionConsumption);
+  const rows=groupSharedRowsFull(),houses=groupHouseIds(),labels=rows.map(r=>r.fecha_label||r.fecha),end=groupCursorIndex(rows),options=commonOptions();
+  options.scales.y={position:'left',beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Producción total kg'}};options.scales.y1={position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'Consumo global kg'}};
+  state.charts.productionConsumption=new Chart(el('productionConsumptionChart'),{type:'line',data:{labels,datasets:[{label:'Producción total',data:revealSeries(totalMapSeries(rows,'produccion_por_caseta',houses),end),borderColor:COLORS.blueLight,backgroundColor:'rgba(0,178,227,.10)',fill:true,tension:.25,pointRadius:0,yAxisID:'y'},{label:'Consumo global',data:revealSeries(rows.map(r=>numberOrZero(r.consumo_global)),end),borderColor:COLORS.greenDark,backgroundColor:COLORS.greenDark,tension:.18,pointRadius:0,yAxisID:'y1'}]},options});attachDoubleClickZoom(state.charts.productionConsumption);
 }
 
-function sharedWarehouseBuckets(endIndex){
-  const weekly = PAYLOAD.shared_store?.weekly || [];
-  if(!state.data?.daily?.length) return [];
-  const startDate = state.data.daily[state.visibleStart]?.fecha;
-  const endDate = state.data.daily[Math.min(endIndex,state.visibleEnd)]?.fecha;
-  if(!startDate || !endDate) return [];
-  return weekly.filter(row=>row.fecha_fin >= startDate && row.fecha_inicio <= endDate);
+function sharedWarehouseBuckets(){
+  return buildWarehouseBucketsFromDaily(sharedRowsForCurrentPeriod());
+}
+
+function labelForDate(date){
+  const row=state.data?.daily?.find(item=>item.fecha===date);
+  return row?.fecha_label||date||'-';
+}
+
+function warehouseCasetaMetrics(casetas){
+  const summary=aggregateGroupPeriod();
+  const selectedCaseta=String(state.houseId||state.data?.meta?.caseta||'');
+  const metrics=Object.fromEntries(casetas.map(caseta=>[
+    caseta,{
+      day:numberOrZero(summary?.last?.consumo_por_caseta?.[caseta]),
+      period:numberOrZero(summary?.consumptionByHouse?.[caseta]),
+      accumulated:numberOrZero(summary?.consumptionAccumulated?.[caseta]),
+      selected:caseta===selectedCaseta
+    }
+  ]));
+  return {
+    startDate:summary?.first?.fecha,
+    endDate:summary?.last?.fecha,
+    startLabel:summary?.startLabel||'-',
+    endLabel:summary?.endLabel||'-',
+    rangeLabel:summary?.rangeLabel||'-',
+    metrics,selectedCaseta,summary
+  };
+}
+
+function renderWarehouseBalance(summary,buckets){
+  const aggregate=summary.summary;
+  const totals=Object.values(summary.metrics).reduce((acc,item)=>({
+    day:acc.day+item.day,period:acc.period+item.period,accumulated:acc.accumulated+item.accumulated
+  }),{day:0,period:0,accumulated:0});
+  el('warehouseBalance').innerHTML=[
+    ['Periodo calculado',summary.rangeLabel],
+    ['Stock de apertura',aggregate?`${fmtAuto(aggregate.opening)} kg`:'-'],
+    ['Entradas globales',aggregate?`${fmtAuto(aggregate.entries)} kg`:'-'],
+    ['Consumo global almacén',aggregate?`${fmtAuto(aggregate.warehouseConsumption)} kg`:'-'],
+    ['Stock global al cierre',aggregate&&Number.isFinite(aggregate.close)?`${fmtAuto(aggregate.close)} kg`:'-'],
+    ['Otros movimientos netos',aggregate?`${aggregate.otherNet>=0?'+':'-'}${fmtAuto(Math.abs(aggregate.otherNet))} kg`:'-']
+  ].map(([label,value])=>`<div class="warehouse-balance-item"><span>${label}</span><strong>${value}</strong></div>`).join('');
+  return totals;
 }
 
 function updateWarehouseKpis(buckets,casetas){
-  const c = el('phaseKpis');
-  const totals = Object.fromEntries(casetas.map(caseta=>[caseta,0]));
-  buckets.forEach(row=>casetas.forEach(caseta=>{
-    totals[caseta] += Number(row.consumo_por_caseta?.[caseta]||0);
-  }));
-  const totalAll = Object.values(totals).reduce((a,b)=>a+b,0);
-  const last = buckets.length ? buckets[buckets.length-1] : null;
-  const selectedCaseta = String(state.data?.meta?.caseta||'');
-
-  const cards = casetas.map(caseta=>{
-    const value = totals[caseta]||0;
-    const pct = totalAll>0 ? value/totalAll*100 : 0;
-    const selected = caseta===selectedCaseta ? ' · seleccionada' : '';
-    return `<div class="phase-kpi"><span>Caseta ${caseta}${selected}</span><strong>${fmtAuto(value)} kg</strong><span>${fmt(pct,1)}% del consumo visible del almacén</span></div>`;
-  });
-  cards.push(`<div class="phase-kpi"><span>Stock global al cierre visible</span><strong>${last ? fmtAuto(last.stock) : '-'} kg</strong><span>Pendiente de validar contra SAP MB5B</span></div>`);
-  c.innerHTML = cards.join('');
-
-  const selectedValue = totals[selectedCaseta]||0;
-  const otherValue = Math.max(0,totalAll-selectedValue);
-  const splitMode = PAYLOAD.shared_store?.phase_split_mode || '';
-  const modeNote = splitMode==='columnas_por_material'
+  const c=el('phaseKpis');
+  const last=buckets.length?buckets[buckets.length-1]:null;
+  const summary=warehouseCasetaMetrics(casetas);
+  const totals=renderWarehouseBalance(summary,buckets);
+  const totalAll=totals.period;
+  c.innerHTML=casetas.map(caseta=>{
+    const metric=summary.metrics[caseta]||{day:0,period:0,accumulated:0,selected:false};
+    const pct=totalAll>0?metric.period/totalAll*100:0;
+    return `<div class="phase-kpi${metric.selected?' selected':''}">
+      <span>Caseta ${caseta}${metric.selected?' - seleccionada':''}</span>
+      <strong>${fmtAuto(metric.period)} kg</strong>
+      <span>${fmt(pct,1)}% del consumo ${modePhrase()}</span>
+      <div class="metric-row"><span>Último día</span><b>${fmtAuto(metric.day)} kg</b></div>
+      <div class="metric-row"><span>Acumulado al cierre</span><b>${fmtAuto(metric.accumulated)} kg</b></div>
+    </div>`;
+  }).join('');
+  const selectedValue=summary.metrics[summary.selectedCaseta]?.period||0;
+  const otherValue=totalAll-selectedValue;
+  const modeNote=(PAYLOAD.shared_store?.phase_split_mode||'')==='columnas_por_material'
     ? 'Las fases se calcularon con columnas específicas por material.'
-    : 'Las transiciones sin desglose cuantitativo se muestran como “Transición / sin desglose”.';
-  el('phaseAreaInsight').textContent = last
-    ? `En el rango visible, la caseta ${selectedCaseta||'-'} consumió ${fmtAuto(selectedValue)} kg y las otras casetas ${fmtAuto(otherValue)} kg. El stock global reconstruido cerró en ${fmtAuto(last.stock)} kg. ${modeNote}`
-    : 'No hay datos del almacén compartido dentro del rango visible.';
+    : 'Las transiciones sin desglose cuantitativo se muestran como Transición / sin desglose.';
+  el('phaseAreaInsight').textContent=last
+    ? `En ${summary.rangeLabel}, la caseta ${summary.selectedCaseta||'-'} consumió ${fmtAuto(selectedValue)} kg y las otras casetas ${fmtAuto(otherValue)} kg. El almacén registró ${fmtAuto(summary.summary?.warehouseConsumption)} kg de salida y cerró con ${fmtAuto(summary.summary?.close)} kg. ${modeNote}`
+    : 'No hay datos del almacén compartido dentro del periodo calculado.';
 }
 
 function phaseColor(phase){
@@ -1594,16 +2115,14 @@ function phaseColor(phase){
 function createPhaseDataset(buckets,caseta,phase){
   const color = phaseColor(phase);
   return {
-    type:'line',
+    type:'bar',
     label:phase,
     data:buckets.map(row=>Number(row.consumo_por_caseta_fase?.[caseta]?.[phase]||0)),
     borderColor:color,
     backgroundColor:color+'AA',
-    fill:true,
     stack:`caseta_${caseta}`,
     pointRadius:0,
     pointHoverRadius:4,
-    tension:.16,
     borderWidth:1.2,
     yAxisID:'y',
     phase,
@@ -1629,7 +2148,7 @@ function warehouseGlobalOptions(){
     scales:{
       x:{grid:{color:COLORS.paleBlue},ticks:{minRotation:0,maxRotation:90,autoSkip:true,maxTicksLimit:12}},
       y:{beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Stock global (kg)'}},
-      y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'Movimientos semanales (kg)'}}
+      y1:{position:'right',beginAtZero:true,stacked:true,grid:{drawOnChartArea:false},title:{display:true,text:'Movimientos del periodo (kg)'}}
     }
   };
 }
@@ -1646,7 +2165,7 @@ function casetaPhaseOptions(caseta,buckets){
         callbacks:{
           title(items){
             const row=buckets[items?.[0]?.dataIndex];
-            return row ? `Semana ${row.fecha_inicio} a ${row.fecha_fin}` : '';
+            return row ? `${row.fecha_inicio} a ${row.fecha_fin}` : '';
           },
           label(ctx){
             return `${ctx.dataset.label}: ${fmtAuto(ctx.parsed.y)} kg`;
@@ -1664,13 +2183,42 @@ function casetaPhaseOptions(caseta,buckets){
     },
     scales:{
       x:{stacked:true,grid:{color:COLORS.paleBlue},ticks:{minRotation:0,maxRotation:90,autoSkip:true,maxTicksLimit:9}},
-      y:{stacked:true,beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Consumo semanal (kg)'}}
+      y:{stacked:true,beginAtZero:true,grid:{color:COLORS.paleBlue},title:{display:true,text:'Consumo del periodo (kg)'}}
     }
   };
 }
 
+function warehouseGlobalDatasets(buckets,casetas){
+  const casetaColors = [
+    COLORS.blueDark,
+    COLORS.greenDark,
+    COLORS.yellow,
+    COLORS.red,
+    COLORS.blueLight
+  ];
+  const consumoDatasets = casetas.map((caseta,index)=>({
+    type:'bar',
+    label:`Consumo caseta ${caseta}`,
+    data:buckets.map(row=>Number(row.consumo_por_caseta?.[caseta]||0)),
+    backgroundColor:casetaColors[index % casetaColors.length]+'66',
+    borderColor:casetaColors[index % casetaColors.length],
+    borderWidth:1,
+    yAxisID:'y1',
+    stack:'consumo',
+    order:4
+  }));
+
+  return [
+    {type:'line',label:'Stock global almacén',data:buckets.map(b=>b.stock),borderColor:COLORS.red,backgroundColor:COLORS.red,fill:false,pointRadius:2,pointHoverRadius:5,tension:.12,borderWidth:2.5,yAxisID:'y',order:0},
+    {type:'bar',label:'Entradas / reabastos',data:buckets.map(b=>Number(b.entradas||0)),backgroundColor:COLORS.blueLight+'66',borderColor:COLORS.blueLight,borderWidth:1,yAxisID:'y1',stack:'entradas',order:3},
+    ...consumoDatasets,
+    {type:'line',label:'Traspasos',data:buckets.map(b=>Number(b.traspasos||0)),borderColor:COLORS.yellow,backgroundColor:COLORS.yellow,fill:false,pointRadius:2,tension:.1,borderWidth:1.5,yAxisID:'y1'},
+    {type:'line',label:'Ajustes / mermas',data:buckets.map(b=>Number(b.ajustes||0)+Number(b.mermas||0)),borderColor:COLORS.blueDark,backgroundColor:COLORS.blueDark,fill:false,pointRadius:2,tension:.1,borderWidth:1.5,yAxisID:'y1'}
+  ];
+}
+
 function createWarehousePhaseCharts(){
-  const buckets = sharedWarehouseBuckets(state.index);
+  const buckets = sharedWarehouseBuckets();
   const casetas = (PAYLOAD.shared_store?.casetas || []).slice(0,3);
   const phases = PAYLOAD.shared_store?.phases || ['Fase 1','Fase 2','Fase 3','Fase 4','Fase 5','Transición / sin desglose'];
   const labels = buckets.map(row=>row.etiqueta);
@@ -1688,6 +2236,8 @@ function createWarehousePhaseCharts(){
     },
     options:warehouseGlobalOptions()
   });
+  state.charts.warehouseGlobal.data.datasets = warehouseGlobalDatasets(buckets,casetas);
+  state.charts.warehouseGlobal.update('none');
   attachDoubleClickZoom(state.charts.warehouseGlobal);
 
   state.charts.phaseCasetas = [];
@@ -1701,7 +2251,7 @@ function createWarehousePhaseCharts(){
       continue;
     }
     if(card) card.classList.remove('hidden');
-    if(title) title.textContent=`Caseta ${caseta} · consumo semanal por fase`;
+    if(title) title.textContent=`Caseta ${caseta} · consumo ${modePhrase()} por fase`;
     const chart = new Chart(canvas,{
       type:'line',
       data:{labels,datasets:phases.map(phase=>createPhaseDataset(buckets,caseta,phase))},
@@ -1713,8 +2263,8 @@ function createWarehousePhaseCharts(){
   updateWarehouseKpis(buckets,casetas);
 }
 
-function updateWarehousePhaseCharts(endIndex){
-  const buckets = sharedWarehouseBuckets(endIndex);
+function updateWarehousePhaseCharts(){
+  const buckets = sharedWarehouseBuckets();
   const casetas = (PAYLOAD.shared_store?.casetas || []).slice(0,3);
   const phases = PAYLOAD.shared_store?.phases || [];
   const labels = buckets.map(row=>row.etiqueta);
@@ -1722,16 +2272,15 @@ function updateWarehousePhaseCharts(endIndex){
   if(state.charts.warehouseGlobal){
     const chart=state.charts.warehouseGlobal;
     chart.data.labels=labels;
-    chart.data.datasets[0].data=buckets.map(b=>b.stock);
-    chart.data.datasets[1].data=buckets.map(b=>Number(b.entradas||0));
-    chart.data.datasets[2].data=buckets.map(b=>Number(b.traspasos||0));
-    chart.data.datasets[3].data=buckets.map(b=>Number(b.ajustes||0)+Number(b.mermas||0));
+    chart.data.datasets=warehouseGlobalDatasets(buckets,casetas);
     chart.update('none');
   }
 
   (state.charts.phaseCasetas||[]).forEach((chart,i)=>{
     const caseta=casetas[i];
     if(!caseta) return;
+    const title=el(`phaseCasetaTitle${i}`);
+    if(title) title.textContent=`Caseta ${caseta} · consumo ${modePhrase()} por fase`;
     chart.data.labels=labels;
     chart.data.datasets=phases.map(phase=>createPhaseDataset(buckets,caseta,phase));
     // Actualizar referencia del tooltip al nuevo arreglo.
@@ -1772,36 +2321,17 @@ function validatorRowHtml(r){
   </tr>`;
 }
 
-function stockValidationRows(endIndex){
-  const rows = state.data.daily.slice(state.visibleStart,Math.min(endIndex,state.visibleEnd)+1);
-  return rows.map((r,i)=>{
-    const previousStock = i > 0 ? Number(rows[i-1].stock || 0) : 0;
-    const entries = Number(r.entrada_alimento || 0);
-    const consumption = Number(r.consumo_real || 0);
-    const other =
-      Number(r.traspasos_internos || 0) +
-      Number(r.ajustes_inventario || 0) +
-      Number(r.movimientos_logisticos || 0) +
-      Number(r.traslados_641_643 || 0) +
-      Number(r.ajustes_511_512 || 0) -
-      Math.abs(Number(r.mermas_551_552 || 0));
-
-    const calculated = i === 0
-      ? Number(r.stock || 0)
-      : previousStock + entries - consumption + other;
-
-    const reconstructed = Number(r.stock || 0);
-    const difference = reconstructed - calculated;
-
+function stockValidationRows(){
+  return sharedRowsForCurrentPeriod().map(r=>{
+    const previousStock=numberOrZero(r.stock_apertura);
+    const entries=numberOrZero(r.entradas);
+    const consumption=numberOrZero(r.consumo_global);
+    const other=numberOrZero(r.movimiento_stock_total)-entries+consumption;
+    const calculated=previousStock+entries-consumption+other;
+    const reconstructed=numberOrZero(r.stock);
     return {
-      fecha:r.fecha_label,
-      previousStock,
-      entries,
-      consumption,
-      other,
-      calculated,
-      reconstructed,
-      difference
+      fecha:r.fecha_label||r.fecha,previousStock,entries,consumption,other,
+      calculated,reconstructed,difference:reconstructed-calculated
     };
   });
 }
@@ -1828,7 +2358,7 @@ function renderValidator(){
 
   el('validatorHistoryBody').innerHTML = historyRows.map(validatorRowHtml).join('');
 
-  const stockRows = stockValidationRows(state.index).slice(-250);
+  const stockRows = stockValidationRows().slice(-250);
   el('validatorStockBody').innerHTML = stockRows.map(r=>{
     const ok = Math.abs(r.difference) < .01;
     return `<tr>
@@ -1857,7 +2387,7 @@ function setupValidatorTabs(){
 }
 
 function createMovementChart(){
-  const totals = movementTotals(state.index);
+  const totals = movementTotals();
   updateMovementCards(totals);
 
   state.charts.movements = new Chart(el('movementChart'),{
@@ -1937,158 +2467,251 @@ function renderEventCards(){
 }
 
 function renderTable(){
-  el('weeklyTable').innerHTML = state.data.weekly.map(r=>`
-    <tr>
-      <td>Semana ${r.semana}</td>
-      <td>${r.fecha_inicio} — ${r.fecha_fin}</td>
-      <td>${fmtAuto(r.consumo_real)}</td>
-      <td>${fmtAuto(r.consumo_estandar)}</td>
-      <td>${fmtAuto(r.produccion_real)}</td>
-      <td>${fmtAuto(r.produccion_estandar)}</td>
-      <td>${fmtAuto(r.ica_real)}</td>
-      <td>${fmtAuto(r.ica_estandar)}</td>
-      <td>${r.estado_ica}</td>
-    </tr>`).join('');
+  const rows=selectedHouseWeeklyRows(state.data?.daily?.[state.visibleEnd]?.fecha);
+  el('weeklyTable').innerHTML=rows.map(r=>`<tr>
+    <td>Semana ${r.semana}${r.dias<7?' · parcial':''}</td>
+    <td>${r.fecha_inicio} — ${r.fecha_fin}</td>
+    <td>${fmtAuto(r.consumo_real)}</td>
+    <td>${fmtAuto(r.consumo_estandar)}</td>
+    <td>${fmtAuto(r.produccion_real)}</td>
+    <td>${fmtAuto(r.produccion_estandar)}</td>
+    <td>${fmtAuto(r.ica_real)}</td>
+    <td>${fmtAuto(r.ica_estandar)}</td>
+    <td>${r.estado_ica||'-'}</td>
+  </tr>`).join('');
 }
 
+
+function inventoryCoverage(){
+  const rows=groupSharedRowsFull();const cursorDate=state.data?.daily?.[state.index]?.fecha;const visible=rows.filter(r=>r.fecha<=cursorDate);const recent=visible.slice(-14).map(r=>numberOrZero(r.consumo_global)).filter(v=>v>0);const avg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:0;const stock=numberOrZero(visible.at(-1)?.stock);return {avg,days:avg>0?stock/avg:null,stock,maxObserved:Math.max(0,...visible.map(r=>numberOrZero(r.stock)))};
+}
+function coverageState(days){if(days===null)return {label:'Sin consumo reciente',className:'preventive',action:'Validar movimientos y consumo.'};if(days<3)return {label:'Crítico',className:'critical',action:'Programar reabasto inmediato.'};if(days<7)return {label:'Bajo',className:'low',action:'Confirmar pedido y fecha de entrega.'};if(days<15)return {label:'Preventivo',className:'preventive',action:'Revisar plan de abastecimiento.'};return {label:'Normal',className:'',action:'Continuar monitoreo diario.'};}
+function severityRank(value){const v=String(value||'').toLowerCase();return v==='critica'?4:v==='alta'?3:v==='media'?2:v==='baja'?1:0;}
+function operationalAlerts(summary,coverage){
+  const alerts=[];if(!summary)return [{severity:'high',title:'Sin datos globales',body:'No se encontró información del almacén para la fecha.',action:'Revisar carga del pipeline.'}];
+  if(summary.stockDifference!==null&&Math.abs(summary.stockDifference)>.01)alerts.push({severity:'critical',title:'Diferencia de conciliación',body:`El stock reconstruido difiere ${fmtAuto(summary.stockDifference)} kg del cálculo.`,action:'Revisar movimientos SAP y fecha de corte.'});
+  const houseTotal=Object.values(summary.consumptionByHouse||{}).reduce((a,b)=>a+numberOrZero(b),0);if(Math.abs(houseTotal-summary.warehouseConsumption)>.01)alerts.push({severity:'high',title:'Consumo no asignado',body:`Casetas ${fmtAuto(houseTotal)} kg vs almacén ${fmtAuto(summary.warehouseConsumption)} kg.`,action:'Validar orden y asignación del consumo.'});
+  const cstate=coverageState(coverage.days);if(cstate.className)alerts.push({severity:cstate.className==='critical'?'critical':'preventive',title:`Cobertura de alimento ${cstate.label.toLowerCase()}`,body:coverage.days===null?'No se pudo estimar la cobertura.':`${fmt(coverage.days,1)} días estimados con consumo reciente.`,action:cstate.action});
+  groupHouseIds().forEach(house=>{const detail=summary.lastDetailMap?.[house]||{};if(!Object.keys(detail).length){alerts.push({severity:'high',title:`Caseta ${house} sin datos`,body:'No hay registro productivo para la fecha seleccionada.',action:'Validar orden y carga diaria.'});return;}if(detail.es_anomalia){const sev=severityRank(detail.severidad_anomalia)>=3?'high':'preventive';alerts.push({severity:sev,title:`Anomalía caseta ${house}`,body:detail.motivo_anomalia||'Score de anomalía activado.',action:'Revisar consumo, mortalidad, producción y documento SAP.'});}});
+  return alerts;
+}
+function weightedIca(summary){let num=0,den=0;groupHouseIds().forEach(h=>{const d=summary?.lastDetailMap?.[h]||{},ica=Number(d.ica_principal),birds=numberOrZero(summary?.birdsByHouse?.[h]);if(Number.isFinite(ica)&&birds>0){num+=ica*birds;den+=birds;}});return den>0?num/den:null;}
+function updateOperationalDashboard(){
+  const summary=aggregateGroupPeriod();if(!summary)return;const coverage=inventoryCoverage(),cstate=coverageState(coverage.days),alerts=operationalAlerts(summary,coverage),houses=groupHouseIds(),ica=weightedIca(summary);
+  el('opsIcaConsolidated').textContent=ica===null?'-':fmtAuto(ica);el('opsAlertCount').textContent=String(alerts.length);el('opsAlertNote').textContent=alerts.length?`${alerts.filter(a=>a.severity==='critical'||a.severity==='high').length} requieren atención.`:'Sin alertas críticas.';el('opsDaysSupply').textContent=coverage.days===null?'-':`${fmt(coverage.days,1)} días`;el('opsDaysNote').textContent=coverage.avg>0?`Promedio reciente: ${fmtAuto(coverage.avg)} kg/día.`:'Sin consumo reciente para estimar.';
+  const overall=el('overallState');overall.textContent=alerts.some(a=>a.severity==='critical')?'Atención crítica':alerts.length?'Operación con observaciones':'Operación sin alertas críticas';overall.className=`section-state ${alerts.some(a=>a.severity==='critical')?'critical':alerts.length?'warning':''}`;
+  el('opsAlertStrip').innerHTML=alerts.length?alerts.slice(0,6).map(a=>`<article class="alert-item ${a.severity}"><div class="alert-head"><span>${a.title}</span><span>${a.severity==='critical'?'Crítica':a.severity==='high'?'Alta':'Preventiva'}</span></div><div class="alert-body">${a.body}</div><div class="alert-action">${a.action}</div></article>`).join(''):`<article class="alert-item"><div class="alert-head"><span>Normal</span><span>Sin alertas</span></div><div class="alert-body">Consumos, stock y casetas se encuentran conciliados con el payload disponible.</div><div class="alert-action">Continuar monitoreo diario.</div></article>`;
+  const maxRef=coverage.maxObserved>0?coverage.maxObserved:coverage.stock;const pct=maxRef>0?Math.max(0,Math.min(100,coverage.stock/maxRef*100)):0;const fillHeight=260*pct/100,fillY=315-fillHeight;['siloFillBase','siloFillTexture'].forEach(id=>{const node=el(id);node.setAttribute('y',String(fillY));node.setAttribute('height',String(fillHeight));});el('siloStock').textContent=`${fmtAuto(coverage.stock)} kg`;el('siloPct').textContent=`${fmt(pct,1)}% visual`;el('siloDays').textContent=coverage.days===null?'-':`${fmt(coverage.days,1)} días`;const phases=houses.map(h=>summary.lastDetailMap?.[h]?.fase).filter(Boolean);el('siloMaterial').textContent=phases.length?[...new Set(phases)].join(', '):'-';el('siloCapacity').textContent='No configurada';el('siloReference').textContent=maxRef?`${fmtAuto(maxRef)} kg · máximo observado`:'-';const siloStatus=el('siloStatus');siloStatus.textContent=`${cstate.label} · ${coverage.days===null?'sin estimación':fmt(coverage.days,1)+' días'}`;siloStatus.className=`silo-status ${cstate.className}`;const inventoryState=el('inventoryState');inventoryState.textContent=`${cstate.label} · stock ${fmtAuto(coverage.stock)} kg`;inventoryState.className=`section-state ${cstate.className==='critical'?'critical':cstate.className?'warning':''}`;
+  const positive=summary.entries+Math.max(0,summary.otherNet),negative=Math.min(0,summary.otherNet);el('foodBalanceRows').innerHTML=`<div class="balance-row"><span class="balance-symbol">=</span><div><div class="balance-label">Stock de apertura</div><div class="balance-sub">Saldo reconstruido al inicio del día</div></div><div class="balance-value">${fmtAuto(summary.opening)} kg</div></div><div class="balance-row positive"><span class="balance-symbol">+</span><div><div class="balance-label">Entradas y movimientos positivos</div><div class="balance-sub">Reabastos ${fmtAuto(summary.entries)} kg · otros positivos ${fmtAuto(Math.max(0,summary.otherNet))} kg</div></div><div class="balance-value">${fmtAuto(positive)} kg</div></div>${houses.map(h=>`<div class="balance-row negative"><span class="balance-symbol">−</span><div><div class="balance-label">Consumo caseta ${h}</div><div class="balance-sub">Orden ${summary.lastDetailMap?.[h]?.orden||state.group?.casetas?.[h]?.orden||'-'}</div></div><div class="balance-value">${fmtAuto(summary.consumptionByHouse?.[h])} kg</div></div>`).join('')}<div class="balance-row negative"><span class="balance-symbol">−</span><div><div class="balance-label">Movimientos negativos adicionales</div><div class="balance-sub">Traspasos, ajustes, logística o mermas netas</div></div><div class="balance-value">${fmtAuto(Math.abs(negative))} kg</div></div><div class="balance-row result"><span class="balance-symbol">=</span><div><div class="balance-label">Stock final calculado</div><div class="balance-sub">Diferencia ${summary.stockDifference===null?'-':fmtAuto(summary.stockDifference)} kg</div></div><div class="balance-value">${fmtAuto(summary.close)} kg</div></div>`;
+  const total=Object.values(summary.consumptionByHouse||{}).reduce((a,b)=>a+numberOrZero(b),0);el('foodFlow').innerHTML=houses.map((h,i)=>{const v=numberOrZero(summary.consumptionByHouse?.[h]),share=total>0?v/total*100:0,d=summary.lastDetailMap?.[h]||{},expected=numberOrZero(d.consumo_estandar),diff=expected>0?(v-expected)/expected*100:null;const status=diff===null?'Sin estándar':Math.abs(diff)<=10?'Normal':Math.abs(diff)<=20?'Preventivo':'Revisar';const line=el(`flowLine${i}`);if(line)line.setAttribute('stroke-width',String(3+Math.max(0,Math.min(7,share/12))));return `<article class="flow-house"><h4>Caseta ${h}</h4><div class="order">Orden ${d.orden||state.group?.casetas?.[h]?.orden||'-'}</div><div class="flow-value">${fmtAuto(v)} kg</div><div class="flow-meta">${fmt(share,1)}% del consumo total · acumulado ${fmtAuto(summary.consumptionAccumulated?.[h])} kg<br>${d.fase||'Sin fase'} · ${status}${diff===null?'':` (${diff>=0?'+':''}${fmt(diff,1)}%)`}</div></article>`;}).join('');
+  el('anomalyTabCount').textContent=String(alerts.filter(a=>a.title.toLowerCase().includes('anomal')).length);renderAnomalyWorkspace();
+}
+function renderAnomalyWorkspace(){
+  const summary=aggregateGroupPeriod();if(!summary)return;const houses=groupHouseIds();el('anomalySummary').innerHTML=houses.map(h=>{const d=summary.lastDetailMap?.[h]||{},sev=String(d.severidad_anomalia||'baja').toLowerCase(),cls=sev==='critica'||sev==='alta'?'high':sev==='media'?'preventive':'';return `<article class="panel anomaly-card ${cls}"><h3>Caseta ${h}</h3><div class="anomaly-score">${fmtAuto(d.score_anomalia)}</div><div class="anomaly-reason"><strong>${d.es_anomalia?'Anomalía detectada':'Sin anomalía activa'}</strong><br>${d.motivo_anomalia||'Sin motivos registrados en la fecha seleccionada.'}<br>Severidad: ${d.severidad_anomalia||'baja'}</div></article>`;}).join('');
+  const cursorDate=state.data?.daily?.[state.index]?.fecha,rows=[];houses.forEach(h=>{const pid=state.group?.period_id_por_caseta?.[h],period=PAYLOAD.periods?.[pid];(period?.daily||[]).forEach(r=>{if(r.fecha<=cursorDate&&r.es_anomalia)rows.push({...r,house:h,order:period.meta?.orden||'-'});});});rows.sort((a,b)=>b.fecha.localeCompare(a.fecha));el('anomalyHistoryBody').innerHTML=rows.length?rows.slice(0,150).map(r=>`<tr><td>${r.fecha_label||r.fecha}</td><td>${r.house}</td><td>${r.order}</td><td>${fmtAuto(r.score_anomalia)}</td><td>${r.severidad_anomalia||'-'}</td><td class="validator-description">${r.motivo_anomalia||'-'}</td><td>Validar datos productivos, orden y movimientos SAP relacionados.</td></tr>`).join(''):`<tr><td colspan="7">No hay anomalías detectadas hasta la fecha seleccionada.</td></tr>`;
+}
+function activateWorkspaceTab(name){document.querySelectorAll('.workspace-tab').forEach(b=>b.classList.toggle('active',b.dataset.workspace===name));document.querySelectorAll('[data-workspace-panel]').forEach(p=>p.classList.toggle('active',p.dataset.workspacePanel===name));requestAnimationFrame(()=>{Object.values(state.charts||{}).flatMap(v=>Array.isArray(v)?v:[v]).forEach(chart=>{if(chart&&typeof chart.resize==='function'){chart.resize();chart.update('none');}});});}
+function setupWorkspaceTabs(){document.querySelectorAll('.workspace-tab').forEach(button=>button.addEventListener('click',()=>activateWorkspaceTab(button.dataset.workspace)));el('latestDateBtn')?.addEventListener('click',()=>{const idx=Math.max(0,state.data.daily.length-1);setCalendarRange(idx,idx,'day',idx);});el('printBtn')?.addEventListener('click',()=>window.print());}
+
 function updateDay(index,scrollEvent=false){
-  state.index = Math.max(0,Math.min(index,state.data.daily.length-1));
-  const r = state.data.daily[state.index];
-  el('dateSlider').value = state.index;
-  el('datePill').textContent = `${r.fecha_label} | Semana ${r.semana}, día ${r.dia_semana}`;
-  el('kpiAves').textContent = fmt(r.aves,0);
+  state.index=clampIndex(index);
+  if(state.viewMode!=='range'){
+    applyPeriodBounds(periodBoundsForMode(state.viewMode,state.index));
+  }else{
+    state.index=Math.max(state.visibleStart,Math.min(state.index,state.visibleEnd));
+  }
+  syncCalendarInputs();
+  const cursor=state.data.daily[state.index];
+  const periodRows=selectedHousePeriodRows();
+  const closing=periodRows[periodRows.length-1]||cursor;
+  const sum=key=>periodRows.reduce((acc,row)=>acc+numberOrZero(row[key]),0);
+  const production=sum('produccion_real');
+  const productionExpected=sum('produccion_estandar');
+  const consumption=sum('consumo_real');
+  const consumptionExpected=sum('consumo_estandar');
+  const mortality=sum('mortalidad_dia');
+  const lastIca=[...periodRows].reverse().find(row=>row.ica_principal!==null&&row.ica_principal!==undefined)||closing;
 
-  const previousRow = state.index > 0 ? state.data.daily[state.index-1] : null;
-  const stockCurrent = Number(r.stock || 0);
-  const stockPrevious = previousRow ? Number(previousRow.stock || 0) : null;
-  const stockVariation = stockPrevious === null ? null : stockCurrent - stockPrevious;
+  el('dateSlider').value=state.index;
+  el('datePill').textContent=`${cursor.fecha_label} | cursor · Semana ${cursor.semana}, día ${cursor.dia_semana}`;
+  el('kpiAves').textContent=fmt(closing.aves,0);
+  el('kpiStockDia').textContent=`${fmtAuto(production)} kg`;
+  el('kpiConsumoDia').textContent=`${fmtAuto(consumption)} kg`;
+  el('kpiEntradasDia').textContent=fmtAuto(mortality);
+  el('kpiStockNota').textContent=`Producción esperada ${modePhrase()}: ${fmtAuto(productionExpected)} kg.`;
+  el('kpiConsumo').textContent=`${fmt(closing.consumo_acum,0)} kg`;
+  el('kpiProduccion').textContent=`${fmtAuto(closing.produccion_acum)} kg`;
+  el('kpiMortalidad').textContent=fmt(closing.mortalidad_acum,0);
+  el('kpiIca').textContent=fmtAuto(lastIca?.ica_principal);
+  el('kpiIcaStd').textContent=`Esperado para la edad: ${fmtAuto(lastIca?.ica_estandar)}`;
+  el('kpiEstado').textContent=lastIca?.estado_ica||'-';
+  el('kpiEdad').textContent=`Cierre ${closing.fecha_label} · semana ${closing.semana}`;
 
-  el('kpiStockDia').textContent = `${fmtAuto(stockCurrent)} kg`;
-  el('kpiConsumoDia').textContent = `${fmtAuto(r.consumo_real)} kg`;
-  el('kpiEntradasDia').textContent = `${fmtAuto(r.entrada_alimento)} kg`;
-
-  el('kpiStockNota').textContent = stockVariation === null
-    ? 'Stock reconstruido del primer día; pendiente de validar contra SAP.'
-    : `Variación vs. día anterior: ${stockVariation >= 0 ? '+' : ''}${fmtAuto(stockVariation)} kg. Pendiente de validar contra SAP.`;
-
-  el('kpiConsumo').textContent = `${fmt(r.consumo_acum,0)} kg`;
-  el('kpiProduccion').textContent = `${fmtAuto(r.produccion_acum)} kg`;
-  el('kpiMortalidad').textContent = fmt(r.mortalidad_acum,0);
-  el('kpiIca').textContent = fmtAuto(r.ica_principal);
-  el('kpiIcaStd').textContent = `Esperado para la edad: ${fmtAuto(r.ica_estandar)}`;
-  el('kpiEstado').textContent = r.estado_ica;
-  el('kpiEdad').textContent = `Semana ${r.semana}, día ${r.dia_semana}`;
-
-  const prodDiff = (r.produccion_real ?? 0) - (r.produccion_estandar ?? 0);
-  const consDiff = (r.consumo_real ?? 0) - (r.consumo_estandar ?? 0);
-  el('productionInsight').textContent = `En la fecha seleccionada, la producción se ubicó ${prodDiff >= 0 ? 'por encima' : 'por debajo'} del valor esperado en ${fmtAuto(Math.abs(prodDiff))} kg.`;
-  el('consumptionInsight').textContent = `En la fecha seleccionada, el consumo se ubicó ${consDiff >= 0 ? 'por encima' : 'por debajo'} del valor esperado en ${fmtAuto(Math.abs(consDiff))} kg.`;
-
-  const initialBirds = state.data.daily[0].aves ?? 0;
-  const currentBirds = r.aves ?? 0;
-  const lossPct = initialBirds > 0 ? (initialBirds-currentBirds)/initialBirds*100 : null;
-  el('birdsInsight').textContent = lossPct === null
+  const prodDiff=production-productionExpected;
+  const consDiff=consumption-consumptionExpected;
+  el('productionInsight').textContent=`En el ${modeLabel()}, la producción estuvo ${prodDiff>=0?'por encima':'por debajo'} del esperado en ${fmtAuto(Math.abs(prodDiff))} kg.`;
+  el('consumptionInsight').textContent=`En el ${modeLabel()}, el consumo estuvo ${consDiff>=0?'por encima':'por debajo'} del esperado en ${fmtAuto(Math.abs(consDiff))} kg.`;
+  const initialBirds=state.data.daily[0].aves??0;
+  const currentBirds=closing.aves??0;
+  const lossPct=initialBirds>0?(initialBirds-currentBirds)/initialBirds*100:null;
+  el('birdsInsight').textContent=lossPct===null
     ? 'No fue posible calcular la variación de aves disponibles.'
-    : `Las aves disponibles han variado ${fmt(Math.abs(lossPct),2)}% respecto al inicio del periodo.`;
+    : `Al cierre del periodo, las aves disponibles variaron ${fmt(Math.abs(lossPct),2)}% respecto al inicio del ciclo.`;
+  el('icaInsight').textContent=lastIca?.ica_principal===null||lastIca?.ica_principal===undefined
+    ? 'El ICA no es evaluable al cierre del periodo.'
+    : `Último ICA evaluable: ${fmtAuto(lastIca.ica_principal)} frente a ${fmtAuto(lastIca.ica_estandar)} esperado. Estado: ${lastIca.estado_ica}.`;
 
-  el('icaInsight').textContent = r.ica_principal === null
-    ? 'El ICA no es evaluable para la fecha seleccionada.'
-    : `ICA observado ${fmtAuto(r.ica_principal)} frente a ${fmtAuto(r.ica_estandar)} esperado. Estado: ${r.estado_ica}.`;
+  const groupSummary=aggregateGroupPeriod();
+  el('stockInsight').textContent=groupSummary
+    ? `Periodo ${groupSummary.rangeLabel}. Stock: ${fmtAuto(groupSummary.opening)} → ${fmtAuto(groupSummary.close)} kg; entradas ${fmtAuto(groupSummary.entries)} kg; consumo global ${fmtAuto(groupSummary.warehouseConsumption)} kg; otros netos ${groupSummary.otherNet>=0?'+':'-'}${fmtAuto(Math.abs(groupSummary.otherNet))} kg.`
+    : 'Sin datos globales de stock para el periodo.';
 
-  el('stockInsight').textContent = `Stock al cierre: ${fmtAuto(r.stock)} kg. Entradas: ${fmtAuto(r.entrada_alimento)} kg; traspasos: ${fmtAuto(r.traspasos_internos)} kg; ajustes: ${fmtAuto(Number(r.ajustes_inventario||0)+Number(r.ajustes_511_512||0))} kg; mermas: ${fmtAuto(Math.abs(Number(r.mermas_551_552||0)))} kg.`;
-
+  updateTemporalText();
+  updateGroupSummary();
   updateProgressiveCharts();
   renderNotionTimeline();
   renderValidator();
   renderEventCards();
+  renderTable();
+  updateOperationalDashboard();
 }
 
 function applyVisibleRangeToCharts(){
-  const min = state.visibleStart;
-  const max = state.visibleEnd;
-
-  // Las escalas X son categóricas y usan etiquetas de fecha.
-  // Por eso min/max deben recibir las etiquetas, no índices numéricos.
-  const minLabel = state.data.daily[min]?.fecha_label;
-  const maxLabel = state.data.daily[max]?.fecha_label;
-
+  const min=state.chartStart;
+  const max=state.chartEnd;
+  const minLabel=state.data.daily[min]?.fecha_label;
+  const maxLabel=state.data.daily[max]?.fecha_label;
   ['production','consumption','stock','productionConsumption','birds'].forEach(name=>{
-    const chart = state.charts[name];
-    if(chart && chart.options.scales?.x){
-      if(typeof chart.resetZoom === 'function'){
-        chart.resetZoom('none');
-      }
-
-      chart.options.scales.x.min = minLabel;
-      chart.options.scales.x.max = maxLabel;
+    const chart=state.charts[name];
+    if(chart&&chart.options.scales?.x){
+      if(typeof chart.resetZoom==='function') chart.resetZoom('none');
+      chart.options.scales.x.min=minLabel;
+      chart.options.scales.x.max=maxLabel;
       chart.resize();
       chart.update('none');
     }
   });
-
   if(state.charts.ica){
-    const minWeek = Number(state.data.daily[min]?.semana);
-    const maxWeek = Number(state.data.daily[max]?.semana);
-    const weekly = state.data.weekly;
-
-    let minIdx = weekly.findIndex(row => Number(row.semana) >= minWeek);
-    if(minIdx < 0) minIdx = 0;
-
-    let maxIdx = minIdx;
-    weekly.forEach((row,index)=>{
-      if(Number(row.semana) <= maxWeek){
-        maxIdx = index;
-      }
-    });
-
-    const minWeekLabel = weekly[minIdx]?.etiqueta;
-    const maxWeekLabel = weekly[maxIdx]?.etiqueta;
-
-    if(typeof state.charts.ica.resetZoom === 'function'){
-      state.charts.ica.resetZoom('none');
-    }
-
-    state.charts.ica.options.scales.x.min = minWeekLabel;
-    state.charts.ica.options.scales.x.max = maxWeekLabel;
+    const rows=selectedHouseWeeklyRows(state.data.daily[state.visibleEnd]?.fecha);
+    const visible=rows.filter(row=>row.fecha_fin>=state.data.daily[min]?.fecha&&row.fecha_inicio<=state.data.daily[max]?.fecha);
+    if(typeof state.charts.ica.resetZoom==='function') state.charts.ica.resetZoom('none');
+    state.charts.ica.options.scales.x.min=visible[0]?.etiqueta;
+    state.charts.ica.options.scales.x.max=visible[visible.length-1]?.etiqueta;
     state.charts.ica.resize();
     state.charts.ica.update('none');
   }
+  if(state.charts.warehouseGlobal||state.charts.phaseCasetas?.length) updateWarehousePhaseCharts();
+}
 
-  if(state.charts.warehouseGlobal || state.charts.phaseCasetas?.length){
-    updateWarehousePhaseCharts(Math.min(state.index,state.visibleEnd));
+function nearestIndexFromDate(value){
+  if(!value)return 0;
+  const target=new Date(`${value}T12:00:00`).getTime();
+  let best=0,dist=Infinity;
+  state.data.daily.forEach((row,i)=>{
+    const delta=Math.abs(new Date(`${row.fecha}T12:00:00`).getTime()-target);
+    if(delta<dist){dist=delta;best=i;}
+  });
+  return best;
+}
+
+function setModeRadio(mode){
+  const radio=document.querySelector(`input[name="calendarMode"][value="${mode}"]`);
+  if(radio) radio.checked=true;
+  state.viewMode=mode;
+  el('calendarSingleFields').classList.toggle('hidden',mode!=='day');
+  el('calendarWeekFields').classList.toggle('hidden',mode!=='week');
+  el('calendarRangeFields').classList.toggle('hidden',mode!=='range');
+}
+
+function syncCalendarInputs(){
+  const start=state.data.daily[state.visibleStart]?.fecha;
+  const end=state.data.daily[state.visibleEnd]?.fecha;
+  if(start) el('dateFrom').value=start;
+  if(end){
+    el('dateTo').value=end;
+    el('singleDate').value=end;
+    el('weekDate').value=end;
   }
 }
-function nearestIndexFromDate(value){if(!value)return 0;const target=new Date(`${value}T12:00:00`).getTime();let best=0,dist=Infinity;state.data.daily.forEach((r,i)=>{const d=new Date(`${r.fecha}T12:00:00`).getTime(),delta=Math.abs(d-target);if(delta<dist){dist=delta;best=i;}});return best;}
-function setCalendarRange(start,end){state.visibleStart=Math.max(0,start);state.visibleEnd=Math.min(state.data.daily.length-1,end);el('dateFrom').value=state.data.daily[state.visibleStart].fecha;el('dateTo').value=state.data.daily[state.visibleEnd].fecha;updateDay(state.visibleEnd);applyVisibleRangeToCharts();}
-function applyCalendarSelection(){const mode=document.querySelector('input[name="calendarMode"]:checked')?.value||'range';if(mode==='single'){const idx=nearestIndexFromDate(el('singleDate').value);state.visibleStart=Math.max(0,idx-15);state.visibleEnd=Math.min(state.data.daily.length-1,idx+15);updateDay(idx);}else{const a=nearestIndexFromDate(el('dateFrom').value),b=nearestIndexFromDate(el('dateTo').value);state.visibleStart=Math.min(a,b);state.visibleEnd=Math.max(a,b);updateDay(state.visibleEnd);}applyVisibleRangeToCharts();}
-function setupCalendarControls(){document.querySelectorAll('input[name="calendarMode"]').forEach(r=>r.addEventListener('change',()=>{const single=r.value==='single'&&r.checked;el('calendarSingleFields').classList.toggle('hidden',!single);el('calendarRangeFields').classList.toggle('hidden',single);}));el('applyCalendarBtn').addEventListener('click',applyCalendarSelection);el('allPeriodBtn').addEventListener('click',()=>setCalendarRange(0,state.data.daily.length-1));el('last30Btn').addEventListener('click',()=>setCalendarRange(Math.max(0,state.index-29),state.index));el('last90Btn').addEventListener('click',()=>setCalendarRange(Math.max(0,state.index-89),state.index));el('currentPhaseBtn').addEventListener('click',()=>{const phase=String(state.data.daily[state.index].fase||'').trim();const ids=state.data.daily.map((r,i)=>String(r.fase||'').trim()===phase?i:null).filter(v=>v!==null);if(ids.length)setCalendarRange(Math.min(...ids),Math.max(...ids));});el('toggleTimelineBtn').addEventListener('click',()=>el('notionTimeline').classList.toggle('timeline-compact'));}
 
-function renderPeriod(periodId){
-  state.periodId = periodId;
-  state.data = PAYLOAD.periods[periodId];
+function setCalendarRange(start,end,mode='range',anchor=end){
+  setModeRadio(mode);
+  applyPeriodBounds(periodBoundsForMode(mode,anchor,start,end));
+  syncCalendarInputs();
+  updateDay(mode==='range'?state.visibleEnd:anchor);
+  applyVisibleRangeToCharts();
+}
 
-  // Abrir cada ciclo en la última fecha disponible.
-  state.index = Math.max(0,state.data.daily.length-1);
-  state.visibleStart = 0;
-  state.visibleEnd = Math.max(0,state.data.daily.length-1);
+function applyCalendarSelection(){
+  const mode=document.querySelector('input[name="calendarMode"]:checked')?.value||'day';
+  if(mode==='day'){
+    const idx=nearestIndexFromDate(el('singleDate').value);
+    setCalendarRange(idx,idx,'day',idx);
+    return;
+  }
+  if(mode==='week'){
+    const idx=nearestIndexFromDate(el('weekDate').value);
+    setCalendarRange(weekStartIndex(idx),idx,'week',idx);
+    return;
+  }
+  const a=nearestIndexFromDate(el('dateFrom').value);
+  const b=nearestIndexFromDate(el('dateTo').value);
+  setCalendarRange(Math.min(a,b),Math.max(a,b),'range',Math.max(a,b));
+}
+
+function navigationStep(){return state.viewMode==='week'?7:1;}
+function navigatePeriod(direction){
+  const target=clampIndex(state.index+direction*navigationStep());
+  if(state.viewMode==='range'){
+    state.index=Math.max(state.visibleStart,Math.min(target,state.visibleEnd));
+    updateDay(state.index);
+    return;
+  }
+  setCalendarRange(target,target,state.viewMode,target);
+}
+
+function setupCalendarControls(){
+  document.querySelectorAll('input[name="calendarMode"]').forEach(radio=>radio.addEventListener('change',()=>{
+    if(!radio.checked)return;
+    setModeRadio(radio.value);
+    syncCalendarInputs();
+    applyCalendarSelection();
+  }));
+  el('applyCalendarBtn').addEventListener('click',applyCalendarSelection);
+  el('allPeriodBtn').addEventListener('click',()=>setCalendarRange(0,state.data.daily.length-1,'range',state.data.daily.length-1));
+  el('last30Btn').addEventListener('click',()=>setCalendarRange(Math.max(0,state.index-29),state.index,'range',state.index));
+  el('last90Btn').addEventListener('click',()=>setCalendarRange(Math.max(0,state.index-89),state.index,'range',state.index));
+  el('currentPhaseBtn').addEventListener('click',()=>{
+    const phase=String(state.data.daily[state.index].fase||'').trim();
+    const ids=state.data.daily.map((r,i)=>String(r.fase||'').trim()===phase?i:null).filter(v=>v!==null);
+    if(ids.length)setCalendarRange(Math.min(...ids),Math.max(...ids),'range',Math.max(...ids));
+  });
+  el('toggleTimelineBtn').addEventListener('click',()=>el('notionTimeline').classList.toggle('timeline-compact'));
+}
+
+function renderPeriod(periodId,preserveTemporal=true){
+  const previousEndDate=preserveTemporal ? state.data?.daily?.[state.visibleEnd]?.fecha||null : null;
+  const previousMode=preserveTemporal ? state.viewMode||'day' : 'day';
+  state.periodId=periodId;
+  state.data=PAYLOAD.periods[periodId];
+  state.index=previousEndDate?nearestIndexFromDate(previousEndDate):Math.max(0,state.data.daily.length-1);
+  state.viewMode=previousMode;
+  applyPeriodBounds(periodBoundsForMode(state.viewMode,state.index,0,state.index));
   destroyCharts();
 
-  const m = state.data.meta;
-  el('metaCentro').textContent = m.centro || '-';
-  el('metaCaseta').textContent = m.caseta || '-';
-  el('metaEstado').textContent = m.estado || '-';
-  el('metaLote').textContent = m.lote || '-';
-  el('metaOrden').textContent = m.orden || '-';
-  el('metaInicio').textContent = m.fecha_inicio || '-';
-  el('standardSource').textContent = `Estándar: ${m.fuente_estandar || '-'}`;
+  const m=state.data.meta;
+  state.houseId=String(m.caseta||state.houseId||'');
+  if(el('houseSelect')) el('houseSelect').value=state.houseId;
+  el('detailContext').textContent=`Referencia técnica: caseta ${m.caseta||'-'} · orden ${m.orden||'-'}`;
+  renderGroupHeader();
 
-  el('dateSlider').max = Math.max(0,state.data.daily.length-1);
-  const firstDate=state.data.daily[0].fecha,lastDate=state.data.daily[state.data.daily.length-1].fecha;
-  ['dateFrom','dateTo','singleDate'].forEach(id=>{el(id).min=firstDate;el(id).max=lastDate;});
-  el('dateFrom').value=firstDate;
-  el('dateTo').value=lastDate;
-  el('singleDate').value=lastDate;
-  state.events = buildTimelineEvents(state.data.daily);
+  el('dateSlider').max=Math.max(0,state.data.daily.length-1);
+  const firstDate=state.data.daily[0].fecha;
+  const lastDate=state.data.daily[state.data.daily.length-1].fecha;
+  ['dateFrom','dateTo','singleDate','weekDate'].forEach(id=>{el(id).min=firstDate;el(id).max=lastDate;});
+  setModeRadio(state.viewMode);
+  syncCalendarInputs();
+  state.events=buildTimelineEvents(state.data.daily);
   renderNotionTimeline();
   createProductionChart();
   createConsumptionChart();
@@ -2099,7 +2722,6 @@ function renderPeriod(periodId){
   createIcaChart();
   createBirdsChart();
   createMovementChart();
-  renderTable();
   renderValidator();
   updateDay(state.index);
   applyVisibleRangeToCharts();
@@ -2119,13 +2741,22 @@ function stopPlayback(){
 }
 
 function startPlayback(){
-  if(!state.data || !state.data.daily.length) return;
-  if(state.index >= state.data.daily.length-1) updateDay(0);
-  state.playing = true;
+  if(!state.data||!state.data.daily.length)return;
+  if(state.index>=state.data.daily.length-1){
+    if(state.viewMode==='range') updateDay(state.visibleStart);
+    else setCalendarRange(0,0,state.viewMode,0);
+  }
+  state.playing=true;
   updatePlayButton();
-  state.timer = setInterval(()=>{
-    if(state.index >= state.data.daily.length-1){ stopPlayback(); return; }
-    updateDay(state.index+1);
+  state.timer=setInterval(()=>{
+    const target=state.index+navigationStep();
+    if(target>=state.data.daily.length){stopPlayback();return;}
+    if(state.viewMode==='range'){
+      if(target>state.visibleEnd){stopPlayback();return;}
+      updateDay(target);
+    }else{
+      setCalendarRange(target,target,state.viewMode,target);
+    }
   },state.speedMs);
 }
 
@@ -2135,28 +2766,38 @@ function togglePlayback(){
 
 function setup(){
   // La reproducción es independiente del desplazamiento de la página.
-  // El usuario puede bajar, subir o usar gestos táctiles sin detener el avance.
+  // El selector principal trabaja con la parvada completa; houseSelect
+  // conserva una caseta para las gráficas heredadas de detalle.
   const select = el('periodSelect');
-  PAYLOAD.period_ids.forEach(id=>{
-    const m = PAYLOAD.periods[id].meta;
+  const groupIds = PAYLOAD.cycle_group_ids || [];
+  groupIds.forEach(id=>{
+    const group = PAYLOAD.cycle_groups?.[id] || {};
+    const meta = group.meta || {};
     const option = document.createElement('option');
     option.value = id;
-    option.textContent = `${id} | Caseta ${m.caseta || '-'} | Lote ${m.lote || '-'}`;
+    option.textContent = `${meta.label || id} · ${meta.estado || '-'} · ${meta.grupo_completo ? 'completo' : 'incompleto'}`;
     select.appendChild(option);
   });
 
-  select.addEventListener('change',e=>{ stopPlayback(); renderPeriod(e.target.value); });
-  el('dateSlider').addEventListener('input',e=>updateDay(Number(e.target.value)));
-  el('prevDay').addEventListener('click',()=>updateDay(state.index-1));
-  el('nextDay').addEventListener('click',()=>updateDay(state.index+1));
+  select.addEventListener('change',event=>renderCycleGroup(event.target.value));
+  el('houseSelect').addEventListener('change',event=>selectHouse(event.target.value));
+  el('dateSlider').addEventListener('input',event=>updateDay(Number(event.target.value)));
+  el('singleDate').addEventListener('change',()=>applyCalendarSelection());
+  el('prevDay').addEventListener('click',()=>navigatePeriod(-1));
+  el('nextDay').addEventListener('click',()=>navigatePeriod(1));
   el('playPause').addEventListener('click',togglePlayback);
   el('generatedAt').textContent = PAYLOAD.generated_at;
   setupValidatorTabs();
   setupCalendarControls();
+  setupWorkspaceTabs();
 
-  if(PAYLOAD.period_ids.length){
-    select.value = PAYLOAD.period_ids[0];
-    renderPeriod(PAYLOAD.period_ids[0]);
+  if(groupIds.length){
+    const defaultGroup = groupIds[groupIds.length-1];
+    select.value = defaultGroup;
+    renderCycleGroup(defaultGroup);
+    setModeRadio('day');
+    const idx=Math.max(0,state.data.daily.length-1);
+    setCalendarRange(idx,idx,'day',idx);
   }
 }
 setup();
