@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 from pathlib import Path
 from typing import Any
@@ -14,7 +15,33 @@ from .dashboard_payload import (
 
 
 PAYLOAD_MARKER = "__PAYLOAD_JSON__"
+LOGO_MARKER = "__LOGO_DATA_URI__"
+LOGO_FILENAME = "crio.png"
 TEMPLATE_FILENAME = "dashboard_productivo.html"
+
+
+def _logo_data_uri(template_path: Path) -> str:
+    """
+    Devuelve el logo CRÍO como data URI base64 para incrustarlo en el
+    dashboard (documento autocontenido y portable).
+
+    El archivo se busca en src/crio.png, relativo a la plantilla.
+    Si no existe, se devuelve una cadena vacía y el HTML usa el
+    respaldo textual definido en la plantilla.
+    """
+
+    logo_path = (
+        template_path.parent.parent.parent / LOGO_FILENAME
+    )
+
+    if not logo_path.exists():
+        return ""
+
+    encoded = base64.b64encode(
+        logo_path.read_bytes()
+    ).decode("ascii")
+
+    return f"data:image/png;base64,{encoded}"
 
 
 def _default_template_path() -> Path:
@@ -125,7 +152,7 @@ def render_dashboard_html(
         payload
     )
 
-    template, _ = _read_template(
+    template, resolved_path = _read_template(
         template_path
     )
 
@@ -144,6 +171,11 @@ def render_dashboard_html(
             "El marcador del payload no fue "
             "reemplazado correctamente."
         )
+
+    html_content = html_content.replace(
+        LOGO_MARKER,
+        _logo_data_uri(resolved_path),
+    )
 
     return html_content
 
