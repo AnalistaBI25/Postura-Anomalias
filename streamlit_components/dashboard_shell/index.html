@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard productivo</title>
+  <style>
+    :root {
+      --blue-dark: #1A428A;
+      --blue: #00B2E3;
+      --green: #266041;
+      --green-light: #88BD54;
+      --red: #DC0814;
+      --yellow: #FDC600;
+      --surface: #FFFFFF;
+      --surface-blue: #F2FBFE;
+      --border: #CBEAF4;
+      --text: #12335E;
+      --soft: #315B7F;
+      --shadow: 0 16px 38px rgba(26, 66, 138, .12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Montserrat, Arial, sans-serif;
+      background: #eef7fb;
+      color: var(--text);
+    }
+    body { padding: 10px; overflow-x: hidden; }
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: stretch;
+      width: 100%;
+    }
+    .side {
+      position: sticky;
+      top: 10px;
+      align-self: start;
+      display: grid;
+      gap: 10px;
+    }
+    .card, .dashboard-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+    .card { padding: 14px; }
+    .eyebrow {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    h1 {
+      color: var(--blue-dark);
+      font-size: 25px;
+      line-height: 1.05;
+      margin: 0 0 7px;
+    }
+    .copy {
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .dev-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .dev-badge {
+      border: 1px solid #9bdaf2;
+      border-radius: 999px;
+      background: var(--surface-blue);
+      color: var(--blue-dark);
+      font-size: 11px;
+      font-weight: 900;
+      padding: 6px 8px;
+    }
+    .history {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface-blue);
+      padding: 9px;
+      min-width: 0;
+    }
+    .metric span {
+      display: block;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .metric strong {
+      display: block;
+      color: var(--blue-dark);
+      font-size: 13px;
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+    }
+    .dropzone {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 160px;
+      padding: 16px;
+      border: 2px dashed var(--blue);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F5FCFF 100%);
+      cursor: pointer;
+      transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+      text-align: center;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--green-light);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 178, 227, .14);
+    }
+    .dropzone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .upload-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 9px;
+      background: var(--blue-dark);
+      color: white;
+      font-weight: 900;
+      font-size: 22px;
+    }
+    .drop-title {
+      color: var(--blue-dark);
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .drop-note {
+      color: var(--soft);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+    .file-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--blue-dark);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .file-item small {
+      color: var(--soft);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .toggle-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .toggle-row input { accent-color: var(--blue-dark); }
+    .action {
+      width: 100%;
+      margin-top: 10px;
+      min-height: 42px;
+      border: 1px solid var(--blue-dark);
+      border-radius: 13px;
+      background: var(--blue-dark);
+      color: white;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .action:disabled {
+      border-color: #c8d4e3;
+      background: #e8eef5;
+      color: #8794a6;
+      cursor: not-allowed;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8f3f8;
+      margin-top: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--green-light) 100%);
+      transition: width .25s ease;
+    }
+    .progress-text {
+      margin-top: 7px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .status-title {
+      color: var(--blue-dark);
+      font-size: 14px;
+      font-weight: 900;
+      margin: 0 0 5px;
+    }
+    .status-message {
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .status-complete .status-title { color: var(--green); }
+    .status-error .status-title,
+    .status-validation_error .status-title,
+    .status-config_error .status-title { color: var(--red); }
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+    .mini-table th, .mini-table td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    .mini-table th {
+      color: white;
+      background: var(--blue-dark);
+    }
+    .mini-table td {
+      background: #fff;
+      color: var(--text);
+    }
+    .detail {
+      margin-top: 7px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #fff7f7;
+      border: 1px solid #f2c8c8;
+      color: #8b2525;
+      font-size: 11px;
+      line-height: 1.3;
+    }
+    .dashboard-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .dashboard-head h2 {
+      color: var(--blue-dark);
+      font-size: 18px;
+      margin: 0;
+    }
+    .dashboard-head p {
+      color: var(--soft);
+      font-size: 12px;
+      margin: 2px 0 0;
+    }
+    .dashboard-frame {
+      width: 100%;
+      height: 1580px;
+      border: 0;
+      display: block;
+      background: #fff;
+    }
+    @media (max-width: 980px) {
+      body { padding: 6px; }
+      .shell { grid-template-columns: 1fr; }
+      .side { position: static; }
+      .dashboard-frame { height: 1450px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <aside class="side">
+      <section class="card">
+        <div class="eyebrow">Entrada de datos</div>
+        <h1>Carga SAP</h1>
+        <p class="copy">Sube exportaciones MB51. El host procesa Python por detras y regresa el dashboard HTML actualizado.</p>
+        <div class="dev-row" aria-label="Herramientas del dashboard">
+          <span class="dev-badge">HTML</span>
+          <span class="dev-badge">CSS</span>
+          <span class="dev-badge">JS</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="history" id="historyBox"></div>
+      </section>
+
+      <section class="card">
+        <label class="dropzone" id="dropzone">
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple />
+          <div>
+            <div class="upload-icon">+</div>
+            <div class="drop-title">Arrastra o selecciona archivo</div>
+            <div class="drop-note">XLSX, XLS o CSV de SAP MB51</div>
+          </div>
+        </label>
+        <div class="file-list" id="fileList"></div>
+        <label class="toggle-row">
+          <input id="executePipeline" type="checkbox" checked />
+          Recalcular dashboard al confirmar
+        </label>
+        <button class="action" id="sendBtn" disabled>Validar y actualizar</button>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText">Esperando archivo SAP</div>
+      </section>
+
+      <section class="card" id="statusCard">
+        <p class="status-title" id="statusTitle">Esperando archivo SAP</p>
+        <p class="status-message" id="statusMessage">Carga una exportacion MB51 para actualizar el dashboard.</p>
+        <div id="statusDetails"></div>
+      </section>
+    </aside>
+
+    <section>
+      <div class="dashboard-head card">
+        <div>
+          <h2>Dashboard productivo</h2>
+          <p>Alertas, controles y navegacion operativa viven dentro del HTML.</p>
+        </div>
+        <div class="dev-row" aria-hidden="true">
+          <span class="dev-badge">HTML</span>
+          <span class="dev-badge">CSS</span>
+          <span class="dev-badge">JS</span>
+        </div>
+      </div>
+      <div class="dashboard-card">
+        <iframe class="dashboard-frame" id="dashboardFrame" title="Dashboard productivo"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      args: {},
+      files: [],
+      dashboardHash: "",
+    };
+
+    function sendStreamlitMessage(type, data) {
+      window.parent.postMessage({ isStreamlitMessage: true, type, ...data }, "*");
+    }
+    function setComponentReady() {
+      sendStreamlitMessage("streamlit:componentReady", { apiVersion: 1 });
+    }
+    function setFrameHeight() {
+      const height = Math.max(document.documentElement.scrollHeight, 900);
+      sendStreamlitMessage("streamlit:setFrameHeight", { height });
+    }
+    function setComponentValue(value) {
+      sendStreamlitMessage("streamlit:setComponentValue", { value, dataType: "json" });
+    }
+    function $(id) { return document.getElementById(id); }
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+    function formatBytes(bytes) {
+      const n = Number(bytes) || 0;
+      if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
+      if (n >= 1024) return `${(n / 1024).toFixed(1)} KB`;
+      return `${n} B`;
+    }
+    function shortHash(text) {
+      let hash = 0;
+      const str = String(text || "");
+      for (let i = 0; i < str.length; i += 1) {
+        hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+      }
+      return String(hash);
+    }
+    function setProgress(value, text) {
+      $("progressFill").style.width = `${Math.max(0, Math.min(100, value))}%`;
+      $("progressText").textContent = text;
+    }
+    function renderHistory(history) {
+      const box = $("historyBox");
+      if (!history || !history.ready) {
+        box.innerHTML = `
+          <div class="metric" style="grid-column:1/-1">
+            <span>Modo</span><strong>Consulta</strong>
+          </div>`;
+        return;
+      }
+      box.innerHTML = `
+        <div class="metric"><span>Granja</span><strong>${escapeHtml(history.farm_name || "-")}</strong></div>
+        <div class="metric"><span>Centro</span><strong>${escapeHtml(history.center_id || "-")}</strong></div>
+        <div class="metric"><span>Inicio</span><strong>${escapeHtml(history.min_date || "-")}</strong></div>
+        <div class="metric"><span>Ultima fecha</span><strong>${escapeHtml(history.max_date || "-")}</strong></div>`;
+    }
+    function renderStatus(status) {
+      const current = status || {};
+      const stage = current.stage || "idle";
+      $("statusCard").className = `card status-${stage}`;
+      $("statusTitle").textContent = current.title || "Esperando archivo SAP";
+      $("statusMessage").textContent = current.message || "";
+      setProgress(Number(current.progress || 0), current.title || "Esperando archivo SAP");
+
+      const validations = Array.isArray(current.validations) ? current.validations : [];
+      const results = Array.isArray(current.results) ? current.results : [];
+      const validationRows = validations.slice(0, 6).map(row => `
+        <tr>
+          <td>${escapeHtml(row.archivo)}</td>
+          <td>${escapeHtml(row.fuente || "-")}</td>
+          <td>${row.valido ? "Si" : "No"}</td>
+        </tr>`).join("");
+      const resultRows = results.slice(0, 6).map(row => `
+        <tr>
+          <td>${escapeHtml(row.archivo)}</td>
+          <td>${escapeHtml(row.estado)}</td>
+          <td>${escapeHtml(row.insertados)}</td>
+        </tr>`).join("");
+      const errors = validations
+        .flatMap(row => (row.errores || []).map(error => `${row.archivo}: ${error}`))
+        .slice(0, 4);
+
+      $("statusDetails").innerHTML = `
+        ${validationRows ? `<table class="mini-table"><thead><tr><th>Archivo</th><th>Fuente</th><th>Valido</th></tr></thead><tbody>${validationRows}</tbody></table>` : ""}
+        ${resultRows ? `<table class="mini-table"><thead><tr><th>Archivo</th><th>Estado</th><th>Insertados</th></tr></thead><tbody>${resultRows}</tbody></table>` : ""}
+        ${errors.length ? `<div class="detail">${errors.map(escapeHtml).join("<br>")}</div>` : ""}
+      `;
+      setFrameHeight();
+    }
+    function renderDashboard(html) {
+      const hash = shortHash(html);
+      if (hash === state.dashboardHash) return;
+      state.dashboardHash = hash;
+      $("dashboardFrame").srcdoc = html || "<h1>Dashboard no disponible</h1>";
+    }
+    function renderFileList() {
+      $("sendBtn").disabled = state.files.length === 0 || !state.args.config_ready;
+      $("fileList").innerHTML = state.files.map(file => `
+        <div class="file-item">
+          <span>${escapeHtml(file.name)}</span>
+          <small>${formatBytes(file.size)}</small>
+        </div>`).join("");
+      if (state.files.length) setProgress(18, `${state.files.length} archivo(s) listo(s) para enviar`);
+      setFrameHeight();
+    }
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+    async function sendFiles() {
+      if (!state.files.length || !state.args.config_ready) return;
+      $("sendBtn").disabled = true;
+      setProgress(28, "Leyendo archivo en navegador");
+      try {
+        const files = [];
+        for (let index = 0; index < state.files.length; index += 1) {
+          const file = state.files[index];
+          const data = await readFileAsDataUrl(file);
+          const progress = 32 + Math.round(((index + 1) / state.files.length) * 28);
+          setProgress(progress, `Preparando ${file.name}`);
+          files.push({ name: file.name, size: file.size, type: file.type, data });
+        }
+        setProgress(65, "Enviando al host Streamlit");
+        setComponentValue({
+          eventId: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          executePipeline: $("executePipeline").checked,
+          files,
+        });
+        setProgress(78, "Procesando en Python");
+      } catch (error) {
+        $("sendBtn").disabled = false;
+        $("statusTitle").textContent = "No se pudo leer el archivo";
+        $("statusMessage").textContent = error?.message || String(error);
+        setProgress(100, "Error de lectura");
+      }
+    }
+    function setupUploader() {
+      const input = $("fileInput");
+      const dropzone = $("dropzone");
+      input.addEventListener("change", event => {
+        state.files = Array.from(event.target.files || []);
+        renderFileList();
+      });
+      dropzone.addEventListener("dragover", event => {
+        event.preventDefault();
+        dropzone.classList.add("dragover");
+      });
+      dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+      dropzone.addEventListener("drop", event => {
+        event.preventDefault();
+        dropzone.classList.remove("dragover");
+        state.files = Array.from(event.dataTransfer.files || []);
+        input.files = event.dataTransfer.files;
+        renderFileList();
+      });
+      $("sendBtn").addEventListener("click", sendFiles);
+    }
+    function render(args) {
+      state.args = args || {};
+      renderHistory(state.args.history);
+      renderStatus(state.args.status);
+      renderDashboard(state.args.dashboard_html);
+      renderFileList();
+      setFrameHeight();
+    }
+    window.addEventListener("message", event => {
+      const data = event.data || {};
+      if (data.type === "streamlit:render") render(data.args || {});
+    });
+    setupUploader();
+    setComponentReady();
+    setFrameHeight();
+  </script>
+</body>
+</html>
