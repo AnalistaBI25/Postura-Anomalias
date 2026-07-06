@@ -479,11 +479,18 @@ def ingerir_archivo(
     db: Warehouse,
     usuario: str = "",
     run_id: str = "",
+    solo_mb51: bool = False,
 ) -> ResumenIngesta:
     """Valida, registra e inserta (idempotente) un archivo SAP."""
     path = Path(path)
     informe = validar_archivo(path, config, db)
     carga_id = datetime.now().strftime("%Y%m%d%H%M%S") + "_" + uuid.uuid4().hex[:6]
+    if solo_mb51 and informe.valido and informe.fuente != "MB51":
+        informe.valido = False
+        informe.errores.append(
+            "Esta carga solo acepta el archivo crudo SAP MB51 principal. "
+            "Los maestros y reportes auxiliares deben quedar en config/project.yml."
+        )
 
     registro_base = {
         "id": carga_id,

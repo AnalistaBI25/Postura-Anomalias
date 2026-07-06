@@ -87,6 +87,9 @@ ingestion:
   raw_archive_dir: data/raw/cargas
   # Estrategia ante traslapes: los registros ya existentes se omiten.
   overlap_strategy: insertar_solo_nuevos
+  # La app productiva recibe un solo archivo crudo SAP MB51 por carga.
+  max_files_per_upload: 1
+  accepted_upload_source: MB51
   max_file_mb: 100
 
 coverage:

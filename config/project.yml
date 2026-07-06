@@ -79,6 +79,8 @@ ingestion:
   rejected_dir: data/rejected
   raw_archive_dir: data/raw/cargas
   overlap_strategy: insertar_solo_nuevos
+  max_files_per_upload: 1
+  accepted_upload_source: MB51
   max_file_mb: 100
 
 coverage:

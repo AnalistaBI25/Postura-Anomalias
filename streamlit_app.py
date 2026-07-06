@@ -1,7 +1,7 @@
 """Host Streamlit invisible para el dashboard HTML/JS.
 
 Toda la experiencia visible vive en un componente HTML/CSS/JS. Streamlit solo
-recibe los archivos cargados desde ese componente, ejecuta el pipeline Python y
+recibe el archivo SAP cargado desde ese componente, ejecuta el pipeline Python y
 devuelve el dashboard HTML actualizado.
 """
 
@@ -125,10 +125,9 @@ def _process_upload_event(event: dict[str, Any], config: Any, db: Any) -> dict[s
     from granjas_anomalias.ingestion import (
         ingerir_archivo,
         materializar_kardex_cache,
-        validar_archivo,
     )
 
-    files = event.get("files") or []
+    files = list(event.get("files") or [])
     if not files:
         return {
             "stage": "error",
@@ -137,49 +136,70 @@ def _process_upload_event(event: dict[str, Any], config: Any, db: Any) -> dict[s
             "message": "No se recibió ningún archivo desde el dashboard.",
         }
 
+    max_files = int(config.ingestion.get("max_files_per_upload", 1) or 1)
+    if len(files) > max_files:
+        return {
+            "stage": "validation_error",
+            "progress": 100,
+            "title": "Solo un archivo SAP",
+            "message": (
+                "Sube unicamente el crudo principal MB51. "
+                "La logica, reglas y modelo se aplican despues en Python."
+            ),
+            "validations": [],
+            "results": [],
+        }
+
     incoming = config.root / config.ingestion.get("incoming_dir", "data/incoming")
     incoming.mkdir(parents=True, exist_ok=True)
 
-    informes = []
-    rutas = []
-    for file_info in files:
-        safe_name = Path(str(file_info.get("name") or "archivo_sap")).name
-        destino = incoming / safe_name
-        destino.write_bytes(_decode_upload(file_info))
-        rutas.append(destino)
-        informes.append(validar_archivo(destino, config, db))
+    file_info = files[0]
+    safe_name = Path(str(file_info.get("name") or "archivo_sap")).name
+    destino = incoming / safe_name
+    destino.write_bytes(_decode_upload(file_info))
 
+    accepted_source = str(config.ingestion.get("accepted_upload_source", "MB51")).upper()
+    resumen = ingerir_archivo(
+        destino,
+        config,
+        db,
+        usuario="dashboard",
+        solo_mb51=accepted_source == "MB51",
+    )
+    informes = [resumen.informe] if resumen.informe is not None else []
     validations = _summarize_validation(informes)
-    validos = [(inf, ruta) for inf, ruta in zip(informes, rutas) if inf.valido]
-    if not validos:
+    if resumen.estado == "RECHAZADO":
         return {
             "stage": "validation_error",
             "progress": 100,
             "title": "Validación detenida",
-            "message": "El archivo no cumple el formato esperado para MB51.",
+            "message": resumen.mensaje or "El archivo no cumple el formato esperado para MB51.",
             "validations": validations,
             "results": [],
         }
 
-    results = []
     execute_pipeline = bool(event.get("executePipeline", True))
-    for informe, ruta in validos:
-        resumen = ingerir_archivo(ruta, config, db, usuario="dashboard")
-        results.append(
-            {
-                "archivo": ruta.name,
-                "estado": resumen.estado,
-                "insertados": resumen.insertados,
-                "omitidos_duplicados": resumen.omitidos_duplicados,
-                "detalle": resumen.mensaje,
-            }
-        )
+    results = [
+        {
+            "archivo": destino.name,
+            "estado": resumen.estado,
+            "insertados": resumen.insertados,
+            "omitidos_duplicados": resumen.omitidos_duplicados,
+            "detalle": resumen.mensaje,
+        }
+    ]
 
-    if execute_pipeline:
+    if execute_pipeline and resumen.insertados:
         materializar_kardex_cache(db, config)
         _ejecutar_pipeline()
         title = "Dashboard actualizado"
         message = "La carga fue procesada y el HTML fue regenerado correctamente."
+    elif execute_pipeline:
+        title = "Sin registros nuevos"
+        message = (
+            "El archivo ya estaba cargado o no agrego movimientos nuevos; "
+            "se conserva el dashboard actual."
+        )
     else:
         title = "Carga registrada"
         message = "Los movimientos válidos fueron registrados sin regenerar el dashboard."
@@ -208,8 +228,8 @@ if "dashboard_shell_status" not in st.session_state:
     st.session_state.dashboard_shell_status = {
         "stage": "idle",
         "progress": 0,
-        "title": "Esperando archivo SAP",
-        "message": "Carga una exportación MB51 para actualizar el dashboard.",
+        "title": "Esperando crudo SAP MB51",
+        "message": "Sube un solo archivo principal; Python normaliza, valida y recalcula.",
         "validations": [],
         "results": [],
     }

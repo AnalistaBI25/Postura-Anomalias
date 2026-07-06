@@ -230,6 +230,7 @@ class Warehouse:
         """
         if movimientos.empty:
             return 0, 0
+        batch_size = 5_000
         df = movimientos.copy()
         df["creado_en"] = ahora_iso()
         columnas = list(df.columns)
@@ -238,15 +239,20 @@ class Warehouse:
             f"INSERT OR IGNORE INTO movimientos ({', '.join(columnas)}) "
             f"VALUES ({marcadores})"
         )
-        registros = [
-            tuple(None if pd.isna(v) else v for v in fila)
-            for fila in df.itertuples(index=False, name=None)
-        ]
+        insertados = 0
         with self.connect() as conn:
-            antes = conn.execute("SELECT COUNT(*) FROM movimientos").fetchone()[0]
-            conn.executemany(sql, registros)
-            despues = conn.execute("SELECT COUNT(*) FROM movimientos").fetchone()[0]
-        insertados = despues - antes
+            lote = []
+            for fila in df.itertuples(index=False, name=None):
+                lote.append(tuple(None if pd.isna(v) else v for v in fila))
+                if len(lote) >= batch_size:
+                    antes = conn.total_changes
+                    conn.executemany(sql, lote)
+                    insertados += conn.total_changes - antes
+                    lote.clear()
+            if lote:
+                antes = conn.total_changes
+                conn.executemany(sql, lote)
+                insertados += conn.total_changes - antes
         return insertados, len(df) - insertados
 
     def rango_existente(self, centro: str | None = None) -> tuple[str | None, str | None]:

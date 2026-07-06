@@ -255,16 +255,6 @@
       font-weight: 700;
       white-space: nowrap;
     }
-    .toggle-row {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      margin-top: 9px;
-      color: var(--soft);
-      font-size: 11px;
-      font-weight: 800;
-    }
-    .toggle-row input { accent-color: var(--blue-dark); }
     .action {
       width: 100%;
       margin-top: 9px;
@@ -330,6 +320,13 @@
       font-size: 11px;
       line-height: 1.3;
     }
+    .hint {
+      margin-top: 7px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
     .dashboard-head {
       display: flex;
       justify-content: space-between;
@@ -391,16 +388,16 @@
           Carga SAP <span>⌄</span>
         </button>
         <div class="dock-title">
-          <strong id="dockTitle">Esperando archivo SAP</strong>
-          <small id="dockSubtitle">El dashboard actual se mantiene visible.</small>
+          <strong id="dockTitle">Esperando crudo SAP MB51</strong>
+          <small id="dockSubtitle">Python aplica reglas, modelo y dashboard.</small>
         </div>
         <div class="dock-progress" aria-label="Progreso de carga">
           <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
           <div class="progress-text" id="progressText">Sin carga activa</div>
         </div>
         <label class="mini-upload" id="miniUpload">
-          Subir archivo
-          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple />
+          Subir MB51
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
         </label>
       </div>
 
@@ -409,8 +406,8 @@
           <div class="dropzone" id="dropzone" role="button" tabindex="0">
             <div>
               <div class="upload-icon">+</div>
-              <div class="drop-title">Arrastra archivo SAP</div>
-              <div class="drop-note">XLSX, XLS o CSV de MB51</div>
+              <div class="drop-title">Arrastra el crudo SAP MB51</div>
+              <div class="drop-note">Un archivo XLSX, XLS o CSV</div>
             </div>
           </div>
 
@@ -418,17 +415,13 @@
             <div class="section-label">Contexto</div>
             <div class="history" id="historyBox"></div>
             <div class="file-list" id="fileList"></div>
-            <label class="toggle-row">
-              <input id="executePipeline" type="checkbox" checked />
-              Recalcular dashboard al confirmar
-            </label>
-            <button class="action" id="sendBtn" disabled>Validar y actualizar</button>
+            <button class="action" id="sendBtn" disabled>Analizar con Python</button>
           </div>
 
           <div class="panel-card" id="statusCard">
             <div class="section-label">Estado</div>
-            <p class="status-title" id="statusTitle">Esperando archivo SAP</p>
-            <p class="status-message" id="statusMessage">Carga una exportacion MB51 para actualizar el dashboard.</p>
+            <p class="status-title" id="statusTitle">Esperando crudo SAP MB51</p>
+            <p class="status-message" id="statusMessage">Sube un solo archivo principal; Python normaliza, valida y recalcula.</p>
             <div id="statusDetails"></div>
           </div>
         </div>
@@ -439,7 +432,7 @@
       <div class="dashboard-head card">
         <div>
           <h2>Dashboard productivo</h2>
-          <p>La carga no tapa el tablero; solo se despliega cuando hay archivo o resultado.</p>
+          <p>Sube un MB51; las reglas y el modelo viven en Python.</p>
         </div>
         <div class="dev-row" aria-hidden="true">
           <span class="dev-badge">HTML</span>
@@ -457,6 +450,7 @@
     const state = {
       args: {},
       files: [],
+      fileNotice: "",
       dashboardHash: "",
     };
 
@@ -531,10 +525,10 @@
       const validations = Array.isArray(current.validations) ? current.validations : [];
       const results = Array.isArray(current.results) ? current.results : [];
       $("statusCard").className = `panel-card status-${stage}`;
-      $("statusTitle").textContent = current.title || "Esperando archivo SAP";
+      $("statusTitle").textContent = current.title || "Esperando crudo SAP MB51";
       $("statusMessage").textContent = current.message || "";
-      $("dockTitle").textContent = current.title || "Esperando archivo SAP";
-      $("dockSubtitle").textContent = current.message || "El dashboard actual se mantiene visible.";
+      $("dockTitle").textContent = current.title || "Esperando crudo SAP MB51";
+      $("dockSubtitle").textContent = current.message || "Python aplica reglas, modelo y dashboard.";
       setProgress(Number(current.progress || 0), current.title || "Sin carga activa");
 
       const validationRows = validations.slice(0, 6).map(row => `
@@ -569,18 +563,18 @@
     }
     function renderFileList() {
       const configReady = Boolean(state.args.config_ready);
-      $("sendBtn").disabled = state.files.length === 0 || !configReady;
+      $("sendBtn").disabled = state.files.length !== 1 || !configReady;
       $("fileInput").disabled = !configReady;
       $("miniUpload").classList.toggle("disabled", !configReady);
       $("fileList").innerHTML = state.files.map(file => `
         <div class="file-item">
           <span>${escapeHtml(file.name)}</span>
           <small>${formatBytes(file.size)}</small>
-        </div>`).join("");
+        </div>`).join("") + (state.fileNotice ? `<div class="hint">${escapeHtml(state.fileNotice)}</div>` : "");
       if (state.files.length) {
-        $("dockTitle").textContent = `${state.files.length} archivo(s) seleccionado(s)`;
-        $("dockSubtitle").textContent = "Revisa validacion y confirma para actualizar.";
-        setProgress(18, `${state.files.length} archivo(s) listo(s) para enviar`);
+        $("dockTitle").textContent = "Archivo MB51 seleccionado";
+        $("dockSubtitle").textContent = "Python validara, normalizara y recalculara el modelo.";
+        setProgress(18, "Archivo listo para analizar");
         setDockOpen(true);
       }
       setFrameHeight();
@@ -594,23 +588,19 @@
       });
     }
     async function sendFiles() {
-      if (!state.files.length || !state.args.config_ready) return;
+      if (state.files.length !== 1 || !state.args.config_ready) return;
       $("sendBtn").disabled = true;
       setDockOpen(true);
       setProgress(28, "Leyendo archivo en navegador");
       try {
-        const files = [];
-        for (let index = 0; index < state.files.length; index += 1) {
-          const file = state.files[index];
-          const data = await readFileAsDataUrl(file);
-          const progress = 32 + Math.round(((index + 1) / state.files.length) * 28);
-          setProgress(progress, `Preparando ${file.name}`);
-          files.push({ name: file.name, size: file.size, type: file.type, data });
-        }
+        const file = state.files[0];
+        const data = await readFileAsDataUrl(file);
+        const files = [{ name: file.name, size: file.size, type: file.type, data }];
+        setProgress(58, `Preparando ${file.name}`);
         setProgress(65, "Enviando al host Streamlit");
         setComponentValue({
           eventId: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-          executePipeline: $("executePipeline").checked,
+          executePipeline: true,
           files,
         });
         setProgress(78, "Procesando en Python");
@@ -622,7 +612,11 @@
       }
     }
     function updateFiles(fileList) {
-      state.files = Array.from(fileList || []);
+      const selected = Array.from(fileList || []);
+      state.files = selected.slice(0, 1);
+      state.fileNotice = selected.length > 1
+        ? "Solo se procesa el primer archivo; los demas se ignoran."
+        : "";
       renderFileList();
     }
     function setupUploader() {
