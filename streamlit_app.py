@@ -6,6 +6,9 @@ pipeline y muestra el dashboard HTML autocontenido generado por el proyecto.
 
 from __future__ import annotations
 
+import importlib
+import importlib.util
+import subprocess
 import sys
 import traceback
 from pathlib import Path
@@ -20,6 +23,10 @@ sys.path.insert(0, str(ROOT / "src"))
 
 CONFIG_PATH = ROOT / "config" / "project.yml"
 DASHBOARD_PATH = ROOT / "reports" / "dashboard.html"
+EXCEL_RUNTIME_DEPS = {
+    ".xlsx": ("openpyxl", "openpyxl==3.1.5"),
+    ".xls": ("xlrd", "xlrd==2.0.1"),
+}
 
 st.set_page_config(
     page_title="BI Anomalías Avícolas",
@@ -108,6 +115,27 @@ def _ejecutar_pipeline() -> dict:
     from granjas_anomalias.pipeline import run_pipeline
 
     return run_pipeline(CONFIG_PATH)
+
+
+@st.cache_resource(show_spinner=False)
+def _ensure_runtime_package(module_name: str, pip_spec: str) -> None:
+    if importlib.util.find_spec(module_name) is not None:
+        return
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "--quiet", pip_spec]
+    )
+    importlib.invalidate_caches()
+    if importlib.util.find_spec(module_name) is None:
+        raise RuntimeError(f"No se pudo instalar {pip_spec}.")
+
+
+def _ensure_excel_reader(path: Path) -> None:
+    dependency = EXCEL_RUNTIME_DEPS.get(path.suffix.lower())
+    if dependency is None:
+        return
+    module_name, pip_spec = dependency
+    with st.spinner(f"Preparando lector de Excel ({pip_spec})..."):
+        _ensure_runtime_package(module_name, pip_spec)
 
 
 def _mostrar_dashboard() -> None:
@@ -210,6 +238,7 @@ with st.container():
         for archivo in archivos:
             destino = incoming / archivo.name
             destino.write_bytes(archivo.getbuffer())
+            _ensure_excel_reader(destino)
             rutas.append(destino)
             informes.append(validar_archivo(destino, config, db))
 
