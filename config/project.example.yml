@@ -64,12 +64,40 @@ anomaly_detection:
     contamination: 0.035
     random_state: 42
     n_estimators: 400
+  # Modelos comparativos por edad. No modifican el score oficial.
+  shadow_models:
+    enabled: true
+    contamination: 0.035
+    random_state: 42
+    iforest_n_estimators: 300
+    lof_neighbors: 35
+    minimum_segment_rows: 50
   scoring:
     rule_weight: 0.65
     ml_weight: 0.35
     medium_threshold: 40
     high_threshold: 60
     critical_threshold: 80
+
+ingestion:
+  # Almacén lógico incremental (registro de cargas, movimientos, alertas).
+  db_path: data/warehouse.db
+  incoming_dir: data/incoming
+  rejected_dir: data/rejected
+  raw_archive_dir: data/raw/cargas
+  # Estrategia ante traslapes: los registros ya existentes se omiten.
+  overlap_strategy: insertar_solo_nuevos
+  max_file_mb: 100
+
+coverage:
+  # PENDIENTE DE CONFIRMACIÓN CON EL USUARIO O CON EL ÁREA RESPONSABLE:
+  # umbrales provisionales de días de cobertura del almacén de alimento.
+  dias_cobertura_minimo: 3
+  dias_cobertura_objetivo: 7
+  dias_cobertura_maximo: 15
+  ventana_consumo_dias: 7
+  min_dias_historia: 3
+  dias_sin_movimiento_alerta: 14
 
 outputs:
   save_csv: true

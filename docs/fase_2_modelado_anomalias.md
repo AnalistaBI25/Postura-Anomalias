@@ -4,6 +4,15 @@
 
 Pendiente. La Fase 2 debe ejecutarse como investigación no supervisada y validación experta. No reemplaza el pipeline productivo de Fase 1 hasta seleccionar y validar un candidato.
 
+### Avance experimental actual
+
+El pipeline calcula dos señales sombra segmentadas por edad: Isolation Forest y
+Local Outlier Factor (LOF), con bandas 16-30, 31-55 y 56+ semanas. El dashboard
+las presenta junto al Isolation Forest global y al score oficial para comparar
+coincidencias, candidatos exclusivos y volumen de revisión. Estas señales no
+participan en `score_anomalia`; su propósito es reunir evidencia y etiquetas
+expertas antes de cualquier promoción.
+
 ## Objetivo
 
 Comparar enfoques no supervisados para priorizar posibles anomalías de consumo, inventario, movimientos de alimento y comportamiento productivo sin depender de etiquetas reales inexistentes o incompletas.

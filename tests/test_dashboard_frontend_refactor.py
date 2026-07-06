@@ -162,3 +162,24 @@ def test_literal_element_references_have_matching_dom_ids() -> None:
     references = set(re.findall(r"\bel\('([^']+)'\)", template))
 
     assert references - identifiers == set()
+
+
+def test_anomaly_workspace_exposes_shadow_model_comparison() -> None:
+    template = _template()
+
+    for text in (
+        "Comparación en modo sombra",
+        "IF global",
+        "IF por edad",
+        "LOF por edad",
+        "Consenso ≥2 modelos",
+    ):
+        assert text in template
+    for identifier in (
+        "anomalyModelSummary",
+        "anomalySummary",
+        "anomalyHistoryBody",
+    ):
+        assert f'id="{identifier}"' in template
+    assert "function modelOriginLabel" in template
+    assert "r.flag_lof" in template

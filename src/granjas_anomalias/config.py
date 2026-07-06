@@ -36,6 +36,16 @@ class ProjectConfig:
     def outputs(self) -> dict[str, Any]:
         return self.raw["outputs"]
 
+    @property
+    def ingestion(self) -> dict[str, Any]:
+        """Parámetros de ingesta incremental; vacío si el YAML aún no los define."""
+        return self.raw.get("ingestion", {}) or {}
+
+    @property
+    def coverage(self) -> dict[str, Any]:
+        """Umbrales de cobertura de alimento; vacío si el YAML aún no los define."""
+        return self.raw.get("coverage", {}) or {}
+
     def resolve(self, path_key: str) -> Path:
         return (self.root / self.paths[path_key]).resolve()
 

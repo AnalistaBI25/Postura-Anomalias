@@ -1,5 +1,15 @@
 # Changelog
 
+## Sin publicar - modelos sombra para validación experta
+
+- Se conserva sin cambios el score oficial: 65% reglas y 35% Isolation Forest global.
+- Se agregan Isolation Forest y Local Outlier Factor (LOF) segmentados por edad
+  como modelos sombra: 16-30, 31-55 y 56+ semanas.
+- El dashboard compara score y bandera de los tres detectores, muestra el nivel
+  de acuerdo y conserva candidatos exclusivos de los modelos sombra para
+  contrastarlos con SAP y revisión experta.
+- Los modelos sombra no promueven ni eliminan alertas oficiales.
+
 ## 0.2.0 - refinamiento del dashboard y documentación de usuario
 
 Frontend del dashboard (`templates/dashboard_productivo.html`):

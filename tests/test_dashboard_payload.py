@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 from granjas_anomalias.config import ProjectConfig
-from granjas_anomalias.dashboard_payload import _build_shared_store
+from granjas_anomalias.dashboard_payload import _build_shared_store, _prepare_scores
 
 
 def _config() -> ProjectConfig:
@@ -112,3 +112,60 @@ def test_shared_store_daily_flags_consumption_difference() -> None:
     assert day["consumo_global"] == 700.0
     assert day["diferencia_consumo_casetas_almacen"] == -100.0
     assert day["consumo_conciliado"] is False
+
+
+def test_prepare_scores_keeps_shadow_model_fields() -> None:
+    source = pd.DataFrame(
+        {
+            "cycle_id": ["c1"],
+            "fecha": ["2024-07-07"],
+            "score_anomalia": [42.0],
+            "score_ml": [81.0],
+            "flag_ml": [True],
+            "segmento_modelo_sombra": ["16-30 semanas"],
+            "score_iforest_segmentado": [92.0],
+            "flag_iforest_segmentado": [True],
+            "score_lof": [97.0],
+            "flag_lof": [True],
+            "acuerdo_modelos": [3],
+        }
+    )
+
+    result = _prepare_scores(source)
+
+    assert result.loc[0, "score_lof"] == 97.0
+    assert bool(result.loc[0, "flag_lof"])
+    assert result.loc[0, "segmento_modelo_sombra"] == "16-30 semanas"
+    assert result.loc[0, "acuerdo_modelos"] == 3
+
+
+def test_shared_store_exposes_official_and_shadow_scores_by_house() -> None:
+    daily = _daily()
+    daily["score_reglas"] = [20.0, 30.0, 40.0]
+    daily["score_anomalia"] = [10.0, 45.0, 70.0]
+    daily["severidad"] = ["baja", "media", "alta"]
+    daily["es_anomalia"] = [False, True, True]
+    daily["motivo_anomalia"] = ["", "regla", "regla + modelo"]
+    daily["score_ml"] = [11.0, 71.0, 92.0]
+    daily["flag_ml"] = [False, True, True]
+    daily["segmento_modelo_sombra"] = ["16-30 semanas"] * 3
+    daily["score_iforest_segmentado"] = [12.0, 75.0, 95.0]
+    daily["flag_iforest_segmentado"] = [False, True, True]
+    daily["score_lof"] = [15.0, 80.0, 98.0]
+    daily["flag_lof"] = [False, True, True]
+    daily["acuerdo_modelos"] = [0, 3, 3]
+
+    result = _build_shared_store(
+        daily=daily,
+        stock=_stock(),
+        movement_daily=pd.DataFrame(),
+        config=_config(),
+    )
+    detail = result["daily"][0]["casetas_detalle"]["1009"]
+
+    assert detail["score_anomalia"] == 70.0
+    assert detail["es_anomalia"] is True
+    assert detail["score_iforest"] == 92.0
+    assert detail["score_iforest_segmentado"] == 95.0
+    assert detail["score_lof"] == 98.0
+    assert detail["acuerdo_modelos"] == 3

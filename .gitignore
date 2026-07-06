@@ -30,7 +30,7 @@ notebooks/**/*.ipynb
 !notebooks/.gitkeep
 
 # Local configuration, secrets and credentials
-config/project.yml
+
 config/*.local.yml
 config/*.secret.yml
 .env
@@ -96,6 +96,15 @@ logs/**
 *.temp
 *.bak
 ~$*
+
+
+
+
+.claude/
+.codex/
+.agents/
+.github/
+
 
 # OS cruft
 .DS_Store

@@ -6,17 +6,21 @@ from pathlib import Path
 
 import pandas as pd
 
+from .alerts import aplicar_consenso_capas, procesar_alertas
 from .anomaly_rules import apply_rule_anomalies
 from .classify import classify_movements
 from .config import ProjectConfig, load_config
+from .coverage import build_coverage, eventos_cobertura
 from .cycles import associate_orders_and_end_dates, detect_cycles
 from .daily import build_daily_cycles
 from .dashboard import build_dashboard
+from .db import Warehouse
 from .eda import generate_eda_figures, write_eda_report
+from .exports import exportar_salidas
 from .features import build_anomaly_features
 from .io import load_kardex, load_organization, load_standard
 from .logging_utils import configure_logging
-from .models import combine_scores, train_isolation_forest
+from .models import combine_scores, train_isolation_forest, train_shadow_models_by_age
 from .quality import build_labeling_template, build_quality_outputs
 from .normalize import normalize_kardex, normalize_organization
 from .standards import prepare_standard
@@ -32,6 +36,10 @@ def run_pipeline(config_path: str | Path) -> dict[str, Path]:
     config: ProjectConfig = load_config(config_path)
     logger = configure_logging(config.resolve("logs_dir"))
     outputs: dict[str, Path] = {}
+
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    db = Warehouse(config.root / config.ingestion.get("db_path", "data/warehouse.db"))
+    db.iniciar_ejecucion(run_id, str(Path(config_path).resolve()), "fase1+alertas")
 
     logger.info("1/11 Cargando fuentes")
     kardex_raw, kardex_source = load_kardex(config)
@@ -77,13 +85,29 @@ def run_pipeline(config_path: str | Path) -> dict[str, Path]:
 
     logger.info("9/11 Entrenando baseline no supervisado")
     scored, model_path = train_isolation_forest(scored, config)
+    scored = train_shadow_models_by_age(scored, config)
     scored = combine_scores(scored, config)
+    scored = aplicar_consenso_capas(scored, config)
     outputs["features"] = _save(scored, processed, "10_features_y_scores_diarios.csv")
     anomalies = scored.loc[scored["es_anomalia"]].sort_values("score_anomalia", ascending=False)
     outputs["anomalias"] = _save(anomalies, processed, "11_anomalias_consumo.csv")
     outputs["plantilla_validacion"] = build_labeling_template(anomalies, config)
     if model_path is not None:
         outputs["modelo"] = model_path
+
+    logger.info("9b/11 Cobertura de alimento, consenso y alertas")
+    try:
+        cobertura = build_coverage(stock_material, stock_global, daily, config)
+        outputs["cobertura"] = _save(cobertura, processed, "12_cobertura_alimento_diaria.csv")
+        eventos = eventos_cobertura(cobertura, config)
+        alertas = procesar_alertas(scored, weekly, eventos, config, db, run_id)
+        outputs["alertas_consolidadas"] = _save(
+            alertas, processed, "13_alertas_consolidadas.csv"
+        )
+    except Exception:
+        db.cerrar_ejecucion(run_id, "ERROR", "Fallo en cobertura/alertas")
+        logger.exception("Error construyendo cobertura y alertas")
+        raise
 
     logger.info("10/11 Generando EDA, reporte y dashboard")
     if config.outputs.get("generate_figures", True):
@@ -102,6 +126,7 @@ def run_pipeline(config_path: str | Path) -> dict[str, Path]:
     logger.info("11/11 Guardando manifiesto reproducible")
     manifest = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "run_id": run_id,
         "config": str(Path(config_path).resolve()),
         "kardex_source": kardex_source,
         "rows": {
@@ -110,11 +135,17 @@ def run_pipeline(config_path: str | Path) -> dict[str, Path]:
             "daily": len(daily),
             "weekly": len(weekly),
             "anomalies": len(anomalies),
+            "alertas": len(alertas),
         },
         "outputs": {key: str(value) for key, value in outputs.items()},
     }
     manifest_path = config.root / "reports" / "run_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
     outputs["manifest"] = manifest_path
+
+    logger.info("11b/11 Exportando salidas de operación (outputs/)")
+    rutas_export = exportar_salidas(config, db, run_id, alertas, cobertura, weekly, manifest)
+    outputs["outputs_latest"] = rutas_export["execution_manifest"]
+    db.cerrar_ejecucion(run_id, "OK", f"{len(alertas)} alertas")
     logger.info("Pipeline completado")
     return outputs

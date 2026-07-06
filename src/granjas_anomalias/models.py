@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.impute import SimpleImputer
+from sklearn.neighbors import LocalOutlierFactor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
 
@@ -27,6 +28,39 @@ MODEL_FEATURES = [
     "fases_activas_dia",
 ]
 
+SHADOW_AGE_SEGMENTS = (
+    ("16-30 semanas", float("-inf"), 30.0),
+    ("31-55 semanas", 30.0, 55.0),
+    ("56+ semanas", 55.0, float("inf")),
+)
+
+
+def _eligible_model_rows(data: pd.DataFrame) -> pd.Series:
+    """Filas comparables para los detectores no supervisados."""
+
+    return (
+        data["aves_disponibles"].gt(0)
+        & data["consumo_real_kg_dia"].ge(0)
+        & data["dias_desde_inicio"].ge(7)
+    )
+
+
+def _age_segment(age: pd.Series) -> pd.Series:
+    numeric_age = pd.to_numeric(age, errors="coerce")
+    segment = pd.Series("sin segmento", index=age.index, dtype="object")
+    for label, lower, upper in SHADOW_AGE_SEGMENTS:
+        segment.loc[numeric_age.gt(lower) & numeric_age.le(upper)] = label
+    return segment
+
+
+def _percentile_score(raw_score: np.ndarray, index: pd.Index) -> pd.Series:
+    """Convierte rareza a percentil comparable dentro del segmento."""
+
+    return pd.Series(raw_score, index=index, dtype=float).rank(
+        method="average",
+        pct=True,
+    ) * 100.0
+
 
 def train_isolation_forest(
     data: pd.DataFrame,
@@ -39,11 +73,7 @@ def train_isolation_forest(
         result["flag_ml"] = False
         return result, None
 
-    eligible = (
-        result["aves_disponibles"].gt(0)
-        & result["consumo_real_kg_dia"].ge(0)
-        & result["dias_desde_inicio"].ge(7)
-    )
+    eligible = _eligible_model_rows(result)
     train = result.loc[eligible, MODEL_FEATURES].replace([np.inf, -np.inf], np.nan).copy()
     if len(train) < 100:
         result["score_ml"] = 0.0
@@ -90,6 +120,107 @@ def train_isolation_forest(
         json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8"
     )
     return result, model_path
+
+
+def train_shadow_models_by_age(
+    data: pd.DataFrame,
+    config: ProjectConfig,
+) -> pd.DataFrame:
+    """
+    Calcula detectores sombra por banda de edad.
+
+    Estas columnas son exclusivamente comparativas: no participan en
+    ``score_anomalia`` ni cambian la alerta oficial. Isolation Forest segmentado
+    permite medir el efecto de no mezclar edades; LOF aporta una segunda mirada
+    local para la validacion experta.
+    """
+
+    result = data.copy()
+    settings = config.anomaly.get("shadow_models", {})
+    enabled = bool(settings.get("enabled", True))
+    contamination = float(
+        settings.get(
+            "contamination",
+            config.anomaly.get("isolation_forest", {}).get("contamination", 0.035),
+        )
+    )
+    n_estimators = int(settings.get("iforest_n_estimators", 300))
+    random_state = int(settings.get("random_state", 42))
+    requested_neighbors = int(settings.get("lof_neighbors", 35))
+    minimum_rows = int(settings.get("minimum_segment_rows", 50))
+
+    result["segmento_modelo_sombra"] = "no elegible"
+    result["score_iforest_segmentado"] = 0.0
+    result["flag_iforest_segmentado"] = False
+    result["score_lof"] = 0.0
+    result["flag_lof"] = False
+
+    if not enabled:
+        result["acuerdo_modelos"] = result["flag_ml"].astype(int)
+        return result
+
+    eligible = _eligible_model_rows(result)
+    segments = _age_segment(result["edad_semana"])
+    result.loc[eligible, "segmento_modelo_sombra"] = segments.loc[eligible]
+
+    for segment_name in segments.loc[eligible].drop_duplicates():
+        segment_index = result.index[
+            eligible & segments.eq(segment_name)
+        ]
+        if len(segment_index) < minimum_rows:
+            result.loc[segment_index, "segmento_modelo_sombra"] = (
+                f"{segment_name} (muestra insuficiente)"
+            )
+            continue
+
+        matrix = result.loc[segment_index, MODEL_FEATURES].replace(
+            [np.inf, -np.inf],
+            np.nan,
+        )
+        preprocessor = Pipeline(
+            steps=[
+                ("imputer", SimpleImputer(strategy="median")),
+                ("scaler", RobustScaler()),
+            ]
+        )
+        transformed = preprocessor.fit_transform(matrix)
+
+        segmented_iforest = IsolationForest(
+            n_estimators=n_estimators,
+            contamination=contamination,
+            random_state=random_state,
+            n_jobs=-1,
+        )
+        iforest_flags = segmented_iforest.fit_predict(transformed) == -1
+        iforest_raw = -segmented_iforest.decision_function(transformed)
+        result.loc[segment_index, "score_iforest_segmentado"] = (
+            _percentile_score(iforest_raw, segment_index)
+        )
+        result.loc[segment_index, "flag_iforest_segmentado"] = iforest_flags
+
+        neighbors = min(requested_neighbors, len(segment_index) - 1)
+        lof = LocalOutlierFactor(
+            n_neighbors=max(2, neighbors),
+            contamination=contamination,
+        )
+        lof_flags = lof.fit_predict(transformed) == -1
+        lof_raw = -lof.negative_outlier_factor_
+        result.loc[segment_index, "score_lof"] = _percentile_score(
+            lof_raw,
+            segment_index,
+        )
+        result.loc[segment_index, "flag_lof"] = lof_flags
+
+    result["flag_iforest_segmentado"] = result[
+        "flag_iforest_segmentado"
+    ].astype(bool)
+    result["flag_lof"] = result["flag_lof"].astype(bool)
+    result["acuerdo_modelos"] = (
+        result["flag_ml"].astype(int)
+        + result["flag_iforest_segmentado"].astype(int)
+        + result["flag_lof"].astype(int)
+    )
+    return result
 
 
 def combine_scores(data: pd.DataFrame, config: ProjectConfig) -> pd.DataFrame:

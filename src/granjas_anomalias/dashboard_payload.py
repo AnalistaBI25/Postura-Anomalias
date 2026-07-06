@@ -343,6 +343,15 @@ def _prepare_scores(
     wanted_columns = [
         "cycle_id",
         "fecha",
+        "score_reglas",
+        "score_ml",
+        "flag_ml",
+        "segmento_modelo_sombra",
+        "score_iforest_segmentado",
+        "flag_iforest_segmentado",
+        "score_lof",
+        "flag_lof",
+        "acuerdo_modelos",
         "score_anomalia",
         "severidad",
         "es_anomalia",
@@ -1039,6 +1048,19 @@ def _build_shared_store_daily_records(
                     "estado_ica": None,
                     "fase": None,
                     "material_fase": None,
+                    "score_reglas": 0.0,
+                    "score_anomalia": 0.0,
+                    "severidad_anomalia": "baja",
+                    "es_anomalia": False,
+                    "motivo_anomalia": "",
+                    "score_iforest": 0.0,
+                    "flag_iforest": False,
+                    "segmento_modelo_sombra": "no elegible",
+                    "score_iforest_segmentado": 0.0,
+                    "flag_iforest_segmentado": False,
+                    "score_lof": 0.0,
+                    "flag_lof": False,
+                    "acuerdo_modelos": 0,
                 }
                 continue
 
@@ -1164,6 +1186,54 @@ def _build_shared_store_daily_records(
                     source.get("material_alimento_principal"),
                     "",
                 ) or None,
+                "score_reglas": _number(
+                    source.get("score_reglas"),
+                    0.0,
+                ),
+                "score_anomalia": _number(
+                    source.get("score_anomalia"),
+                    0.0,
+                ),
+                "severidad_anomalia": _text(
+                    source.get("severidad"),
+                    "baja",
+                ),
+                "es_anomalia": _boolean(
+                    source.get("es_anomalia")
+                ),
+                "motivo_anomalia": _text(
+                    source.get("motivo_anomalia"),
+                    "",
+                ),
+                "score_iforest": _number(
+                    source.get("score_ml"),
+                    0.0,
+                ),
+                "flag_iforest": _boolean(
+                    source.get("flag_ml")
+                ),
+                "segmento_modelo_sombra": _text(
+                    source.get("segmento_modelo_sombra"),
+                    "no elegible",
+                ),
+                "score_iforest_segmentado": _number(
+                    source.get("score_iforest_segmentado"),
+                    0.0,
+                ),
+                "flag_iforest_segmentado": _boolean(
+                    source.get("flag_iforest_segmentado")
+                ),
+                "score_lof": _number(
+                    source.get("score_lof"),
+                    0.0,
+                ),
+                "flag_lof": _boolean(
+                    source.get("flag_lof")
+                ),
+                "acuerdo_modelos": _integer(
+                    source.get("acuerdo_modelos"),
+                    0,
+                ),
             }
 
         consumption_houses = sum(consumption_by_house.values())
@@ -2298,6 +2368,68 @@ def _regression(
     }
 
 
+_EXPLAIN_FEATURES = {
+    "consumo_g_ave_dia_real": "consumo g/ave",
+    "brecha_consumo_pct_dia": "brecha consumo vs estándar",
+    "cambio_consumo_pct_dia": "cambio diario de consumo",
+    "mortalidad_por_1000": "mortalidad por mil",
+    "ratio_produccion_vs_estandar": "producción vs estándar",
+    "consumo_std_7d": "variabilidad de consumo 7d",
+}
+
+
+def _dominant_features_series(
+    frame: pd.DataFrame,
+    top: int = 3,
+) -> pd.Series:
+    """
+    Explica cada día con las features más alejadas de lo normal del ciclo
+    (z robusto por mediana/MAD dentro del propio ciclo). Devuelve un texto
+    por fila para mostrar el "por qué" de la anomalía en el dashboard.
+    """
+
+    available = [
+        column
+        for column in _EXPLAIN_FEATURES
+        if column in frame.columns
+    ]
+    if not available or frame.empty:
+        return pd.Series("", index=frame.index, dtype="object")
+
+    z_frame = pd.DataFrame(index=frame.index)
+    for column in available:
+        series = pd.to_numeric(frame[column], errors="coerce")
+        median = series.median()
+        mad = (series - median).abs().median() * 1.4826
+        if not np.isfinite(mad) or mad < 1e-9:
+            z_frame[column] = 0.0
+        else:
+            z_frame[column] = (series - median) / mad
+
+    def describe(index: Any) -> str:
+        scores = (
+            z_frame.loc[index]
+            .abs()
+            .replace([np.inf, -np.inf], np.nan)
+            .dropna()
+        )
+        scores = scores[scores > 1.0]
+        if scores.empty:
+            return ""
+        top_features = scores.sort_values(ascending=False).head(top)
+        parts = [
+            f"{_EXPLAIN_FEATURES[column]} (z={z_frame.loc[index, column]:+.1f})"
+            for column in top_features.index
+        ]
+        return "; ".join(parts)
+
+    return pd.Series(
+        [describe(index) for index in frame.index],
+        index=frame.index,
+        dtype="object",
+    )
+
+
 def _daily_records(
     frame: pd.DataFrame,
 ) -> list[dict[str, Any]]:
@@ -2306,6 +2438,8 @@ def _daily_records(
     records: list[
         dict[str, Any]
     ] = []
+
+    explanations = _dominant_features_series(frame)
 
     for _, row in frame.iterrows():
         phase = _text(
@@ -2522,6 +2656,35 @@ def _daily_records(
                     "score_anomalia"
                 )
             ),
+            "score_reglas": _number(
+                row.get("score_reglas")
+            ),
+            "score_iforest": _number(
+                row.get("score_ml")
+            ),
+            "flag_iforest": _boolean(
+                row.get("flag_ml")
+            ),
+            "segmento_modelo_sombra": _text(
+                row.get("segmento_modelo_sombra"),
+                "no elegible",
+            ),
+            "score_iforest_segmentado": _number(
+                row.get("score_iforest_segmentado")
+            ),
+            "flag_iforest_segmentado": _boolean(
+                row.get("flag_iforest_segmentado")
+            ),
+            "score_lof": _number(
+                row.get("score_lof")
+            ),
+            "flag_lof": _boolean(
+                row.get("flag_lof")
+            ),
+            "acuerdo_modelos": _integer(
+                row.get("acuerdo_modelos"),
+                0,
+            ),
             "severidad_anomalia": _text(
                 row.get("severidad"),
                 "sin_clasificar",
@@ -2533,6 +2696,10 @@ def _daily_records(
                 row.get(
                     "motivo_anomalia"
                 ),
+                "",
+            ),
+            "features_dominantes": _text(
+                explanations.get(row.name, ""),
                 "",
             ),
         }

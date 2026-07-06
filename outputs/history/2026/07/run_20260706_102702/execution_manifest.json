@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-07-06T10:27:13",
+  "run_id": "20260706_102702",
+  "config": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\config\\project.yml",
+  "kardex_source": "cache_csv:kardex_mb51_chencopo_2024_2026.csv",
+  "rows": {
+    "kardex": 42900,
+    "cycles": 6,
+    "daily": 1965,
+    "weekly": 285,
+    "anomalies": 115,
+    "alertas": 10
+  },
+  "outputs": {
+    "kardex_normalizado": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\interim\\01_kardex_normalizado_clasificado.csv",
+    "organizacion": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\interim\\02_organizacion_normalizada.csv",
+    "materiales": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\interim\\03_materiales_normalizados.csv",
+    "politica": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\04_politica_preparada.csv",
+    "calidad_fuentes": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\tables\\01_calidad_fuentes.csv",
+    "catalogo_movimientos": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\tables\\02_catalogo_movimientos_sap.csv",
+    "movimientos_no_clasificados": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\tables\\03_movimientos_no_clasificados.csv",
+    "nulos_llaves": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\tables\\04_nulos_llaves_sap.csv",
+    "reporte_calidad": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\CALIDAD_DATOS.md",
+    "ciclos": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\05_ciclos_detectados.csv",
+    "linea_diaria": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\06_linea_diaria_ciclos.csv",
+    "resumen_semanal": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\07_resumen_semanal_ciclos.csv",
+    "stock_material": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\08_stock_alimento_diario_por_material.csv",
+    "stock_global": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\09_stock_alimento_diario_global.csv",
+    "features": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\10_features_y_scores_diarios.csv",
+    "anomalias": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\11_anomalias_consumo.csv",
+    "plantilla_validacion": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\tables\\05_plantilla_validacion_anomalias.csv",
+    "modelo": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\models\\isolation_forest_consumo.joblib",
+    "cobertura": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\12_cobertura_alimento_diaria.csv",
+    "alertas_consolidadas": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\data\\processed\\13_alertas_consolidadas.csv",
+    "reporte_eda": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\EDA_Y_ANOMALIAS.md",
+    "dashboard": "C:\\Users\\jesuscan\\Documents\\proyecto_bi_anomalias_chencopo\\reports\\dashboard.html"
+  },
+  "alertas": {
+    "total": 10,
+    "criticas": 0,
+    "por_estado": {
+      "nueva": 10
+    }
+  }
+}
