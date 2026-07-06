@@ -4,8 +4,8 @@ Uso:
     # Primera vez (histórico): ingiere el kardex configurado en config/project.yml
     python scripts/run_incremental.py --bootstrap
 
-    # Cargas incrementales (uno o varios archivos MB51 crudos)
-    python scripts/run_incremental.py --input nuevo_mb51.xlsx [--input otro.xlsx]
+    # Carga incremental por CLI (la app web publica procesa un solo MB51)
+    python scripts/run_incremental.py --input nuevo_mb51.xlsx
 
     # Solo reprocesar con lo ya cargado
     python scripts/run_incremental.py --solo-pipeline

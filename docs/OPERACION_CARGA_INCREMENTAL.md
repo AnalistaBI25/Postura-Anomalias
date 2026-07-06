@@ -1,59 +1,64 @@
-# Operación: carga incremental desde el dashboard y por CLI
+# Operacion: carga incremental desde el dashboard y por CLI
 
 ## Flujo general
 
 ```text
-Usuario consulta MB51 en SAP y exporta (misma variante que el kardex del proyecto)
-        ↓
-Abre la app:  streamlit run streamlit_app.py  →  pestaña "📤 Carga SAP"
-        ↓
-Arrastra uno o varios archivos (.xlsx/.xls/.csv)
-        ↓
-El sistema valida: extensión, hoja, columnas, fechas, granularidad,
-duplicado exacto (hash) y traslape con lo ya cargado
-        ↓
-Revisa el resumen y la vista previa → Confirmar carga
-        ↓
-Ingesta idempotente a SQLite (solo registros nuevos)
-        ↓
-(Opcional, activado por defecto) pipeline completo: indicadores, ICA,
-cobertura, 4 capas, alertas y dashboard actualizado
-        ↓
-Trazabilidad en outputs/latest, outputs/history y data/warehouse.db
+Usuario exporta MB51 desde SAP
+  -> abre la app Streamlit
+  -> sube un solo archivo MB51
+  -> Python valida estructura, fuente, fechas, duplicados y traslapes
+  -> SQLite registra carga y movimientos nuevos
+  -> el pipeline recalcula indicadores, 4 capas, alertas y dashboard
+  -> el modelo oficial se usa en modo scoring productivo si existe artefacto activo
+  -> el panel operativo permite revisar alertas sin borrar datos
 ```
 
-## Reglas del módulo de carga
+## Reglas del modulo de carga
 
-- **Formato soportado**: exportación directa de MB51 (hoja `Data`, columnas
-  como en `docs/EXTRACCION_DATOS_SAP.md`). También se registran como
-  *maestros* el estándar, la organización y MB5B, pero no generan movimientos:
-  para usarlos hay que sustituir el archivo configurado en `config/project.yml`.
-- **Los libros de trabajo mensuales por granja** (hojas 1..31, Mortalidad,
-  Prod. huevo) **se rechazan**: no son exportaciones directas de SAP.
-- **Los archivos crudos nunca se modifican**: cada carga válida deja copia
-  inmutable en `data/raw/cargas/<id>_<nombre>`; los rechazados van a
-  `data/rejected/` con su motivo en el registro.
-- **Idempotencia**: recargar el mismo archivo (hash idéntico) o un periodo
-  traslapado no duplica movimientos; la llave de negocio es
-  `centro + almacén + material + fecha + clase movimiento + evento +
-  indicador D/H + documento + posición + ejercicio + orden + lote + cantidad`
-  más un contador de ocurrencia para movimientos legítimamente idénticos.
-- **Granularidad**: se detecta del contenido (diaria/semanal/mensual/irregular),
-  junto con rango real, días faltantes, semanas/meses incluidos y fechas
-  futuras. El detalle diario se conserva; las agregaciones se derivan.
-- **Alcance**: granjas con un único almacén de alimento (multi-caseta sí,
-  multialmacén no, por ahora).
+- **Formato soportado:** exportacion directa de MB51 (`.xlsx`, `.xls` o `.csv`) con columnas SAP esperadas.
+- **Un archivo por carga web:** la app publicada procesa solo el primer MB51 seleccionado.
+- **Maestros fuera del upload web:** estandar, organizacion y MB5B se gestionan por rutas de `config/project.yml`.
+- **Rechazo explicito:** reportes mensuales por granja, columnas faltantes, archivos vacios o fuentes no reconocidas se rechazan con motivo.
+- **Idempotencia:** recargar el mismo archivo o un periodo traslapado no duplica movimientos.
+- **Raw inmutable:** los archivos validos quedan archivados y los rechazados quedan en carpeta de rechazo con registro.
 
-## CLI equivalente (automatización)
+## Modelo y scoring
+
+La carga productiva no reentrena el modelo. La configuracion recomendada es:
+
+```yaml
+model_lifecycle:
+  mode: score_existing
+  active_model_path: models/isolation_forest_consumo.joblib
+  metadata_path: models/isolation_forest_metadata.json
+```
+
+Si el modelo activo no existe, el sistema registra `MODEL_MISSING` y no entrena en silencio. El entrenamiento manual se ejecuta con:
+
+```powershell
+python scripts/train_model.py
+```
+
+## CRUD operativo
+
+| Operacion | Entidad | Comportamiento |
+|---|---|---|
+| Crear | carga MB51 | registra metadata, hash y movimientos nuevos |
+| Crear | revision experta | guarda estado, usuario y comentario |
+| Leer | cargas, alertas, modelo | se muestra en panel operativo y exports |
+| Actualizar | revision experta | reemplaza estado vigente y crea evento de auditoria |
+| Eliminar | alerta revisada | se representa como `DESCARTADA`; no hay borrado fisico |
+
+## CLI equivalente
 
 ```powershell
 # Validar un archivo sin cargarlo
 python scripts/validate_input.py --input "nuevo_mb51.xlsx"
 
-# Primera vez: cargar el histórico configurado
+# Primera vez: cargar historico configurado
 python scripts/run_incremental.py --bootstrap
 
-# Carga incremental (uno o varios archivos) + pipeline completo
+# Carga incremental + pipeline completo
 python scripts/run_incremental.py --input "nuevo_mb51.xlsx"
 
 # Solo ingesta, sin recalcular
@@ -62,42 +67,30 @@ python scripts/run_incremental.py --input "nuevo_mb51.xlsx" --sin-pipeline
 # Reprocesar con lo ya cargado
 python scripts/run_incremental.py --solo-pipeline
 
-# Pipeline clásico (lee el cache/kardex configurado, sin ingesta)
-python -m granjas_anomalias.cli run --config config/project.yml
+# Entrenar modelo de forma controlada
+python scripts/train_model.py
 ```
 
-## Dónde queda cada cosa
+## Artefactos operativos
 
-| Artefacto | Ubicación |
+| Artefacto | Ubicacion |
 |---|---|
-| Registro de cargas (metadatos, hash, estado, motivo de rechazo) | `data/warehouse.db` → tabla `cargas`; export en `outputs/latest/file_load_registry.csv` |
-| Movimientos históricos deduplicados | `data/warehouse.db` → tabla `movimientos` |
-| Copias inmutables de archivos válidos | `data/raw/cargas/` |
-| Archivos rechazados | `data/rejected/` |
-| Cobertura de alimento diaria | `data/processed/12_cobertura_alimento_diaria.csv` y `outputs/latest/inventory_coverage.csv` |
-| Alertas consolidadas de la corrida | `data/processed/13_alertas_consolidadas.csv` y `outputs/latest/consolidated_alerts.csv` |
-| Alertas por familia | `outputs/latest/{overstock,shortage,consumption,production,ica,quality}_alerts.csv` |
-| Historial completo de alertas | `data/warehouse.db` → tabla `alertas`; `outputs/latest/alert_history.csv` |
-| Revisiones manuales | `data/warehouse.db` → tabla `alertas_revision` |
-| Datasets del dashboard | `outputs/dashboard/` |
-| Trazabilidad por ejecución | `outputs/history/AAAA/MM/run_<id>/` |
+| Registro de cargas | `data/warehouse.db` tabla `cargas`; `outputs/latest/file_load_registry.csv` |
+| Movimientos deduplicados | `data/warehouse.db` tabla `movimientos` |
+| Alertas consolidadas | `data/processed/13_alertas_consolidadas.csv`; `outputs/latest/consolidated_alerts.csv` |
+| Historial de alertas | `data/warehouse.db` tabla `alertas`; `outputs/latest/alert_history.csv` |
+| Revision vigente | `data/warehouse.db` tabla `alertas_revision`; `outputs/latest/alert_reviews.csv` |
+| Auditoria de revision | `data/warehouse.db` tabla `alertas_revision_eventos`; `outputs/latest/alert_review_audit.csv` |
+| Metricas operativas | `outputs/latest/operational_metrics.json` |
+| Dashboard | `reports/dashboard.html` |
 
-## Metodología de 4 capas (adaptación avícola)
+## Metodologia de 4 capas
 
-| Capa | Pregunta | Implementación |
+| Capa | Pregunta | Implementacion |
 |---|---|---|
-| 1 · Calidad | ¿El dato es válido y conciliable? | Consumo negativo, sin orden, orden fuera de maestro, diferencia de conciliación de stock, stock negativo, consumo mayor al disponible. Se etiqueta `CALIDAD_DE_DATOS`, no como problema productivo. |
-| 2 · Estadística robusta | ¿Es extremo vs su propio historial? | Z robusto (mediana/MAD, ventana 28d) y cambio diario abrupto por ciclo. |
-| 3 · Contextual | ¿Es raro para esta caseta/edad/etapa? | Brecha contra el estándar por edad, consumo cero con aves, mortalidad alta, fases simultáneas, producción baja/cero, ICA semanal fuera de estándar, cobertura fuera de umbrales. |
-| 4 · Multivariada | ¿La combinación es inusual? | Isolation Forest oficial (score 65/35 intacto). Los modelos sombra (IF/LOF por edad) solo aportan evidencia, no promueven alertas. |
+| 1. Calidad | El dato es valido y conciliable? | consumo negativo, sin orden, orden fuera de maestro, diferencia de stock |
+| 2. Estadistica robusta | Es extremo contra su historial? | z robusto y cambio abrupto |
+| 3. Contextual | Es raro para edad, fase o operacion? | brecha contra politica, consumo cero con aves, mortalidad alta, fase multiple |
+| 4. Multivariada | La combinacion es inusual? | Isolation Forest oficial |
 
-**Consenso y severidad**: cada día-ciclo registra qué capas se activaron
-(`capas_activas`, `n_capas`). La severidad de consenso sube con el número de
-capas (≥3 → crítica, 2 → alta) y **nunca degrada** la severidad oficial del
-score. Un hallazgo solo de Capa 1 se reporta como `CALIDAD_DE_DATOS`.
-
-**Ciclo de vida** (comparación entre corridas por `clave_seguimiento`):
-`nueva` → `persistente` (sigue activa) → `resuelta` (dejó de aparecer) →
-`reabierta`/`recurrente` (reaparece), con `cambio_severidad` = subió/bajó.
-La revisión manual (CONFIRMADA / FALSO_POSITIVO / PROBLEMA_DE_DATOS) vive en
-la pestaña "🚨 Alertas" y persiste entre corridas.
+Los modelos sombra por edad aportan evidencia, pero no sustituyen el score oficial.

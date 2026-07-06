@@ -42,6 +42,12 @@ def exportar_salidas(
     cargas = db.listar_cargas()
     rutas["file_load_registry"] = _guardar(cargas, latest / "file_load_registry.csv")
     rutas["dashboard_cargas"] = _guardar(cargas, dashboard / "dashboard_cargas.csv")
+    revisiones = db.leer_revisiones()
+    revision_eventos = db.leer_revision_eventos()
+    rutas["alert_reviews"] = _guardar(revisiones, latest / "alert_reviews.csv")
+    rutas["alert_review_audit"] = _guardar(
+        revision_eventos, latest / "alert_review_audit.csv"
+    )
 
     # --- Cobertura ---
     rutas["inventory_coverage"] = _guardar(cobertura, latest / "inventory_coverage.csv")
@@ -110,6 +116,21 @@ def exportar_salidas(
         "criticas": int(len(criticas)),
         "por_estado": alertas["estado"].value_counts().to_dict() if not alertas.empty else {},
     }
+    manifest["monitoreo"] = {
+        "cargas_total": int(len(cargas)),
+        "cargas_rechazadas": int(cargas["estado"].eq("RECHAZADO").sum()) if "estado" in cargas else 0,
+        "registros_nuevos_total": int(cargas["n_insertados"].fillna(0).sum()) if "n_insertados" in cargas else 0,
+        "revisiones_total": int(len(revisiones)),
+        "eventos_revision_total": int(len(revision_eventos)),
+        "alertas_por_severidad": alertas["severidad"].value_counts().to_dict() if not alertas.empty else {},
+        "alertas_por_familia": alertas["familia"].value_counts().to_dict() if not alertas.empty else {},
+    }
+    metrics_path = latest / "operational_metrics.json"
+    metrics_path.write_text(
+        json.dumps(manifest["monitoreo"], indent=2, ensure_ascii=False, default=str),
+        encoding="utf-8",
+    )
+    rutas["operational_metrics"] = metrics_path
     manifest_path = latest / "execution_manifest.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(

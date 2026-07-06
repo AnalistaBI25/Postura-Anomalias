@@ -239,5 +239,10 @@ def test_revision_manual_persiste(db: Warehouse):
     alertas = _alertas_de({"flag_z_robusto": True}, "run1", db)
     clave = alertas.iloc[0]["clave_seguimiento"]
     db.guardar_revision(clave, "FALSO_POSITIVO", "validado en campo", "tester")
+    db.guardar_revision(clave, "DESCARTADA", "no procede", "tester")
     revisiones = db.leer_revisiones()
-    assert revisiones.iloc[0]["estado_manual"] == "FALSO_POSITIVO"
+    eventos = db.leer_revision_eventos()
+    assert revisiones.iloc[0]["estado_manual"] == "DESCARTADA"
+    assert len(eventos) == 2
+    assert eventos.iloc[0]["estado_anterior"] == "FALSO_POSITIVO"
+    assert eventos.iloc[0]["accion"] == "DESCARTAR"

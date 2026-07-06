@@ -73,6 +73,14 @@ anomaly_detection:
     high_threshold: 60
     critical_threshold: 80
 
+model_lifecycle:
+  mode: score_existing
+  active_model_path: models/isolation_forest_consumo.joblib
+  metadata_path: models/isolation_forest_metadata.json
+  active_model_version: iforest_consumo_baseline
+  approval_status: validacion_pendiente
+  promotion_policy: manual
+
 ingestion:
   db_path: data/warehouse.db
   incoming_dir: data/incoming

@@ -20,7 +20,7 @@ from .exports import exportar_salidas
 from .features import build_anomaly_features
 from .io import load_kardex, load_organization, load_standard
 from .logging_utils import configure_logging
-from .models import combine_scores, train_isolation_forest, train_shadow_models_by_age
+from .models import apply_isolation_forest, combine_scores, train_shadow_models_by_age
 from .quality import build_labeling_template, build_quality_outputs
 from .normalize import normalize_kardex, normalize_organization
 from .standards import prepare_standard
@@ -32,7 +32,7 @@ def _save(df: pd.DataFrame, directory: Path, name: str) -> Path:
     return save_csv(df, directory / name)
 
 
-def run_pipeline(config_path: str | Path) -> dict[str, Path]:
+def run_pipeline(config_path: str | Path, model_mode: str | None = None) -> dict[str, Path]:
     config: ProjectConfig = load_config(config_path)
     logger = configure_logging(config.resolve("logs_dir"))
     outputs: dict[str, Path] = {}
@@ -83,8 +83,8 @@ def run_pipeline(config_path: str | Path) -> dict[str, Path]:
     features = build_anomaly_features(daily, stock_global, cycles, config)
     scored = apply_rule_anomalies(features, config)
 
-    logger.info("9/11 Entrenando baseline no supervisado")
-    scored, model_path = train_isolation_forest(scored, config)
+    logger.info("9/11 Aplicando baseline no supervisado")
+    scored, model_path = apply_isolation_forest(scored, config, mode=model_mode)
     scored = train_shadow_models_by_age(scored, config)
     scored = combine_scores(scored, config)
     scored = aplicar_consenso_capas(scored, config)
@@ -138,6 +138,12 @@ def run_pipeline(config_path: str | Path) -> dict[str, Path]:
             "alertas": len(alertas),
         },
         "outputs": {key: str(value) for key, value in outputs.items()},
+        "model": {
+            "mode": str(model_mode or config.raw.get("model_lifecycle", {}).get("mode", "train")),
+            "status": str(scored.get("modelo_estado", pd.Series([""])).iloc[0]),
+            "version": str(scored.get("modelo_version", pd.Series([""])).iloc[0]),
+            "artifact": str(model_path) if model_path is not None else "",
+        },
     }
     manifest_path = config.root / "reports" / "run_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")

@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterator
+from uuid import uuid4
 
 import pandas as pd
 
@@ -150,6 +151,19 @@ CREATE TABLE IF NOT EXISTS alertas_revision (
     usuario TEXT,
     actualizado_en TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS alertas_revision_eventos (
+    evento_id TEXT PRIMARY KEY,
+    clave_seguimiento TEXT NOT NULL,
+    estado_anterior TEXT,
+    estado_nuevo TEXT NOT NULL,
+    comentario TEXT,
+    usuario TEXT,
+    accion TEXT NOT NULL,
+    creado_en TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_revision_eventos_clave ON alertas_revision_eventos(clave_seguimiento);
 """
 
 
@@ -304,6 +318,14 @@ class Warehouse:
             row = conn.execute(query, (excluir_run_id, excluir_run_id)).fetchone()
         return row["run_id"] if row else None
 
+    def listar_ejecuciones(self, limite: int = 10) -> pd.DataFrame:
+        with self.connect() as conn:
+            return pd.read_sql_query(
+                "SELECT * FROM ejecuciones ORDER BY iniciado_en DESC LIMIT ?",
+                conn,
+                params=(int(limite),),
+            )
+
     # ------------------------------------------------------------------
     # Alertas
     # ------------------------------------------------------------------
@@ -354,14 +376,45 @@ class Warehouse:
         comentario: str = "",
         usuario: str = "",
     ) -> None:
+        estado_manual = estado_manual.strip().upper()
+        accion = "DESCARTAR" if estado_manual == "DESCARTADA" else "ACTUALIZAR"
         with self.connect() as conn:
+            previa = conn.execute(
+                "SELECT estado_manual FROM alertas_revision WHERE clave_seguimiento = ?",
+                (clave_seguimiento,),
+            ).fetchone()
+            estado_anterior = previa["estado_manual"] if previa else ""
+            creado_en = ahora_iso()
             conn.execute(
                 "INSERT OR REPLACE INTO alertas_revision "
                 "(clave_seguimiento, estado_manual, comentario, usuario, actualizado_en) "
                 "VALUES (?, ?, ?, ?, ?)",
-                (clave_seguimiento, estado_manual, comentario, usuario, ahora_iso()),
+                (clave_seguimiento, estado_manual, comentario, usuario, creado_en),
+            )
+            conn.execute(
+                "INSERT INTO alertas_revision_eventos "
+                "(evento_id, clave_seguimiento, estado_anterior, estado_nuevo, comentario, usuario, accion, creado_en) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    uuid4().hex,
+                    clave_seguimiento,
+                    estado_anterior,
+                    estado_manual,
+                    comentario,
+                    usuario,
+                    accion,
+                    creado_en,
+                ),
             )
 
     def leer_revisiones(self) -> pd.DataFrame:
         with self.connect() as conn:
             return pd.read_sql_query("SELECT * FROM alertas_revision", conn)
+
+    def leer_revision_eventos(self, limite: int = 100) -> pd.DataFrame:
+        with self.connect() as conn:
+            return pd.read_sql_query(
+                "SELECT * FROM alertas_revision_eventos ORDER BY creado_en DESC, rowid DESC LIMIT ?",
+                conn,
+                params=(int(limite),),
+            )

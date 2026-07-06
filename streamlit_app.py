@@ -8,7 +8,9 @@ devuelve el dashboard HTML actualizado.
 from __future__ import annotations
 
 import base64
+import json
 import sys
+import time
 import traceback
 from pathlib import Path
 from typing import Any
@@ -96,6 +98,76 @@ def _history_status(config: Any | None, db: Any | None) -> dict[str, Any]:
     }
 
 
+def _model_status(config: Any | None) -> dict[str, Any]:
+    if config is None:
+        return {"ready": False, "mode": "readonly"}
+    lifecycle = config.raw.get("model_lifecycle", {}) or {}
+    model_path = (config.root / lifecycle.get("active_model_path", "models/isolation_forest_consumo.joblib")).resolve()
+    metadata_path = (config.root / lifecycle.get("metadata_path", "models/isolation_forest_metadata.json")).resolve()
+    metadata: dict[str, Any] = {}
+    if metadata_path.exists():
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            metadata = {}
+    return {
+        "ready": True,
+        "mode": str(lifecycle.get("mode", "train")),
+        "model_exists": model_path.exists(),
+        "metadata_exists": metadata_path.exists(),
+        "version": str(metadata.get("model_version") or lifecycle.get("active_model_version", "")),
+        "generated_at": str(metadata.get("generated_at", "")),
+        "approval_status": str(metadata.get("approval_status") or lifecycle.get("approval_status", "")),
+        "artifact": model_path.name,
+    }
+
+
+def _ops_status(config: Any | None, db: Any | None) -> dict[str, Any]:
+    if config is None or db is None:
+        return {"ready": False, "model": _model_status(config), "metrics": {}, "alerts": []}
+
+    cargas = db.listar_cargas()
+    ejecuciones = db.listar_ejecuciones(5)
+    alertas = db.leer_alertas()
+    revisiones = db.leer_revisiones()
+    if not alertas.empty:
+        alertas = alertas.sort_values("creado_en", ascending=False)
+    recientes = []
+    for _, row in alertas.head(30).iterrows():
+        clave = str(row.get("clave_seguimiento", ""))
+        if not clave:
+            continue
+        recientes.append(
+            {
+                "clave": clave,
+                "label": " | ".join(
+                    part
+                    for part in [
+                        str(row.get("fecha_inicial", "") or row.get("fecha_final", "")),
+                        str(row.get("caseta", "") or row.get("almacen", "")),
+                        str(row.get("familia", "")),
+                        str(row.get("severidad", "")),
+                    ]
+                    if part
+                ),
+            }
+        )
+    metrics = {
+        "cargas": int(len(cargas)),
+        "rechazadas": int(cargas["estado"].eq("RECHAZADO").sum()) if "estado" in cargas else 0,
+        "registros_nuevos": int(cargas["n_insertados"].fillna(0).sum()) if "n_insertados" in cargas else 0,
+        "alertas": int(len(alertas)),
+        "revisadas": int(len(revisiones)),
+        "ultima_ejecucion": str(ejecuciones.iloc[0].get("resultado", "")) if not ejecuciones.empty else "",
+    }
+    return {
+        "ready": True,
+        "model": _model_status(config),
+        "metrics": metrics,
+        "alerts": recientes,
+    }
+
+
 def _decode_upload(file_info: dict[str, Any]) -> bytes:
     data = str(file_info.get("data", ""))
     encoded = data.split(",", 1)[1] if "," in data else data
@@ -153,6 +225,7 @@ def _process_upload_event(event: dict[str, Any], config: Any, db: Any) -> dict[s
     incoming = config.root / config.ingestion.get("incoming_dir", "data/incoming")
     incoming.mkdir(parents=True, exist_ok=True)
 
+    started = time.perf_counter()
     file_info = files[0]
     safe_name = Path(str(file_info.get("name") or "archivo_sap")).name
     destino = incoming / safe_name
@@ -209,8 +282,45 @@ def _process_upload_event(event: dict[str, Any], config: Any, db: Any) -> dict[s
         "progress": 100,
         "title": title,
         "message": message,
+        "duration_seconds": round(time.perf_counter() - started, 2),
         "validations": validations,
         "results": results,
+    }
+
+
+def _process_review_event(event: dict[str, Any], db: Any) -> dict[str, Any]:
+    review = event.get("review") or {}
+    clave = str(review.get("clave") or "").strip()
+    estado = str(review.get("estado") or "").strip().upper()
+    usuario = str(review.get("usuario") or "dashboard").strip() or "dashboard"
+    comentario = str(review.get("comentario") or "").strip()
+    estados_validos = {"CONFIRMADA", "FALSO_POSITIVO", "PROBLEMA_DE_DATOS", "DESCARTADA"}
+    if not clave:
+        return {
+            "stage": "error",
+            "progress": 100,
+            "title": "Selecciona una alerta",
+            "message": "Elige una clave de seguimiento para registrar la revision.",
+            "validations": [],
+            "results": [],
+        }
+    if estado not in estados_validos:
+        return {
+            "stage": "error",
+            "progress": 100,
+            "title": "Estado no valido",
+            "message": f"Usa uno de: {', '.join(sorted(estados_validos))}.",
+            "validations": [],
+            "results": [],
+        }
+    db.guardar_revision(clave, estado, comentario=comentario, usuario=usuario)
+    return {
+        "stage": "complete",
+        "progress": 100,
+        "title": "Revision guardada",
+        "message": f"{clave} quedo como {estado}.",
+        "validations": [],
+        "results": [{"archivo": clave, "estado": estado, "insertados": 0}],
     }
 
 
@@ -229,7 +339,7 @@ if "dashboard_shell_status" not in st.session_state:
         "stage": "idle",
         "progress": 0,
         "title": "Esperando crudo SAP MB51",
-        "message": "Sube un solo archivo principal; Python normaliza, valida y recalcula.",
+        "message": "Sube un solo MB51; Python normaliza, valida y ejecuta scoring.",
         "validations": [],
         "results": [],
     }
@@ -256,6 +366,7 @@ component_value = dashboard_shell(
     dashboard_html=_dashboard_html(),
     status=st.session_state.dashboard_shell_status,
     history=_history_status(config, db),
+    ops=_ops_status(config, db),
     config_ready=bool(config is not None and db is not None),
     key="dashboard_shell",
     default=None,
@@ -276,11 +387,15 @@ if isinstance(component_value, dict):
             }
         else:
             try:
-                st.session_state.dashboard_shell_status = _process_upload_event(
-                    component_value,
-                    config,
-                    db,
-                )
+                action = str(component_value.get("action", "upload"))
+                if action == "save_review":
+                    st.session_state.dashboard_shell_status = _process_review_event(component_value, db)
+                else:
+                    st.session_state.dashboard_shell_status = _process_upload_event(
+                        component_value,
+                        config,
+                        db,
+                    )
             except Exception as exc:  # noqa: BLE001
                 st.session_state.dashboard_shell_status = {
                     "stage": "error",
