@@ -1,0 +1,97 @@
+project:
+  name: proyecto_bi_anomalias_chencopo
+  center_id: "1217"
+  farm_name: "CHENCOPO 2"
+  timezone: "America/Merida"
+  analysis_start: "2024-07-01"
+  analysis_end: null
+  initial_age_week: 16
+  initial_age_day: 0
+
+paths:
+  kardex_excel: data/raw/kardex_mb51_chencopo_2024_2026.xlsx
+  kardex_cache_csv: data/cache/kardex_mb51_chencopo_2024_2026.csv
+  standard_excel: data/raw/standard_sap.xlsx
+  organization_excel: data/raw/organizacion_granjas_postura.xlsx
+  mb5b_excel: data/raw/stock_inicial_mb5b.xlsx
+  interim_dir: data/interim
+  processed_dir: data/processed
+  figures_dir: reports/figures
+  tables_dir: reports/tables
+  models_dir: models
+  logs_dir: logs
+
+sap:
+  bird_material: "20019"
+  feed_warehouse: "1100"
+  production_warehouse: "3400"
+  houses: ["1007", "1008", "1009"]
+  feed_materials:
+    "10007": "Fase 1"
+    "10008": "Fase 2"
+    "10009": "Fase 3"
+    "10010": "Fase 4"
+    "10011": "Fase 5"
+  production_materials:
+    "50012": "Huevo normal"
+    "50150": "Huevo libre de jaula"
+    "50008": "Huevo jumbo"
+    "50009": "Huevo picado"
+    "50010": "Huevo roto"
+    "50011": "Huevo sucio"
+    "50129": "Huevo clasificado"
+  normal_egg_materials: ["50012", "50150"]
+  subproduct_materials: ["50008", "50009", "50010", "50011", "50129"]
+
+stock:
+  initial_stock_date: "2024-07-06"
+  initial_stock_source: "MB5B/manual_validated"
+  initial_stock_kg:
+    "10007": 0.0
+    "10008": 0.0
+    "10009": 0.0
+    "10010": 0.0
+    "10011": 0.0
+
+anomaly_detection:
+  minimum_history_days: 14
+  rolling_window_days: 28
+  robust_z_threshold: 3.5
+  policy_gap_warning_pct: 0.15
+  policy_gap_critical_pct: 0.30
+  daily_change_warning_pct: 0.35
+  zero_consumption_with_birds_days: 1
+  isolation_forest:
+    enabled: true
+    contamination: 0.035
+    random_state: 42
+    n_estimators: 400
+  scoring:
+    rule_weight: 0.65
+    ml_weight: 0.35
+    medium_threshold: 40
+    high_threshold: 60
+    critical_threshold: 80
+
+ingestion:
+  db_path: data/warehouse.db
+  incoming_dir: data/incoming
+  rejected_dir: data/rejected
+  raw_archive_dir: data/raw/cargas
+  overlap_strategy: insertar_solo_nuevos
+  max_file_mb: 100
+
+coverage:
+  # PENDIENTE DE CONFIRMACION: umbrales provisionales de dias de cobertura.
+  dias_cobertura_minimo: 3
+  dias_cobertura_objetivo: 7
+  dias_cobertura_maximo: 15
+  ventana_consumo_dias: 7
+  min_dias_historia: 3
+  dias_sin_movimiento_alerta: 14
+
+outputs:
+  save_csv: true
+  build_dashboard: true
+  generate_figures: true
+  train_ml_baseline: true
