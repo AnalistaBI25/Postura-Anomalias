@@ -1,0 +1,15 @@
+# Configuración del servidor Streamlit para el despliegue del dashboard.
+# maxUploadSize se alinea con ingestion.max_file_mb (config/project.yml):
+# los archivos mayores se rechazan antes de transferirse al servidor.
+
+[server]
+maxUploadSize = 100
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#1A428A"
+backgroundColor = "#eef7fb"

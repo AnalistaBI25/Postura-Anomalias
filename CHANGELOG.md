@@ -1,5 +1,26 @@
 # Changelog
 
+## Sin publicar - revisión predeploy y sistema de agentes (rama deploy-dashboard-chencopo)
+
+- Revisión formal de preparación para producción con recomendación
+  **LISTO PARA PR CON OBSERVACIONES** (`docs/entregable_final.md`).
+- Validación analítica independiente de KPIs contra el kardex: conciliación
+  exacta de filas, consumo, entradas, agregación semanal e ICA
+  (`docs/data_science.md`).
+- Sistema de agentes de revisión continua en Fase 1 solo lectura
+  (`agents/`, `python -m agents.orquestador`): git, datos, data science,
+  rendimiento, seguridad, pruebas, despliegue y documental, con hallazgos
+  estructurados en `reports/agentes/<timestamp>/`.
+- Mediciones de rendimiento y escalabilidad 1x–10x con límites operativos
+  (`docs/rendimiento_big_o.md`, `docs/pruebas_rendimiento.md`).
+- Nueva configuración `.streamlit/config.toml` (límite de carga 100 MB
+  alineado con la ingesta; telemetría desactivada).
+- Suite documental predeploy: seguridad, despliegue, monitoreo, CRUD, UI/UX,
+  limitaciones, plan de mejoras y checklist de producción (`docs/`).
+- Hallazgo crítico documentado para decisión de negocio: repositorio público
+  con configuración y dashboard de datos reales versionados
+  (`docs/seguridad.md`).
+
 ## Sin publicar - modelos sombra para validación experta
 
 - Se conserva sin cambios el score oficial: 65% reglas y 35% Isolation Forest global.
