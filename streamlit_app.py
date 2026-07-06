@@ -1,13 +1,7 @@
-"""Punto de entrada Streamlit del proyecto.
+"""Host Streamlit del dashboard productivo.
 
-Pestañas:
-- Dashboard: el HTML autocontenido generado por el pipeline (sin cambios).
-- Carga SAP: subir exportaciones MB51 crudas, validarlas, confirmarlas y
-  procesarlas de forma incremental e idempotente.
-- Alertas: revisión de alertas consolidadas con estados manuales persistentes.
-- Historial: registro de cargas y ejecuciones.
-
-Ejecutar con: ``streamlit run streamlit_app.py``
+Streamlit se usa solo como backend/host: recibe archivos SAP, ejecuta el
+pipeline y muestra el dashboard HTML autocontenido generado por el proyecto.
 """
 
 from __future__ import annotations
@@ -27,8 +21,6 @@ sys.path.insert(0, str(ROOT / "src"))
 CONFIG_PATH = ROOT / "config" / "project.yml"
 DASHBOARD_PATH = ROOT / "reports" / "dashboard.html"
 
-ESTADOS_MANUALES = ["PENDIENTE", "CONFIRMADA", "FALSO_POSITIVO", "PROBLEMA_DE_DATOS"]
-
 st.set_page_config(
     page_title="BI Anomalías Avícolas",
     layout="wide",
@@ -38,8 +30,61 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-      .block-container { max-width: 100%; padding-top: 1rem; }
+      .block-container {
+        max-width: 100%;
+        padding: 0.75rem 1.5rem 0;
+      }
       header, footer { visibility: hidden; }
+      div[data-testid="stToolbar"] { display: none; }
+
+      .upload-shell {
+        max-width: 1180px;
+        margin: 0 auto 1rem;
+        padding: 1rem 1.25rem;
+        border: 1px solid #bfe7f6;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #f8fdff 0%, #eefaff 100%);
+        box-shadow: 0 14px 38px rgba(7, 75, 120, 0.08);
+      }
+      .upload-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.75rem;
+      }
+      .upload-title {
+        margin: 0;
+        color: #173f8a;
+        font-size: 1.35rem;
+        font-weight: 800;
+      }
+      .upload-subtitle {
+        margin: 0.15rem 0 0;
+        color: #2b5d88;
+        font-size: 0.95rem;
+      }
+      .upload-badge {
+        color: #17458f;
+        background: #ffffff;
+        border: 1px solid #9bdaf2;
+        border-radius: 999px;
+        padding: 0.45rem 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      div[data-testid="stFileUploader"] {
+        padding: 0.35rem 0 0;
+      }
+      div[data-testid="stFileUploaderDropzone"] {
+        border-color: #2aaee8;
+        background: #ffffff;
+      }
+      .dashboard-shell {
+        max-width: 100%;
+        margin: 0 auto;
+      }
     </style>
     """,
     unsafe_allow_html=True,
@@ -65,9 +110,23 @@ def _ejecutar_pipeline() -> dict:
     return run_pipeline(CONFIG_PATH)
 
 
-# ----------------------------------------------------------------------
-# Pestañas
-# ----------------------------------------------------------------------
+def _mostrar_dashboard() -> None:
+    st.markdown('<div class="dashboard-shell">', unsafe_allow_html=True)
+    if DASHBOARD_PATH.exists():
+        components.html(
+            DASHBOARD_PATH.read_text(encoding="utf-8"),
+            height=1400,
+            scrolling=True,
+        )
+    else:
+        st.info(
+            "Aún no existe reports/dashboard.html. Sube un archivo SAP y ejecuta "
+            "el pipeline, o corre `python -m granjas_anomalias.cli run --config "
+            "config/project.yml`."
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
 config = None
 db = None
 config_error = None
@@ -78,42 +137,38 @@ if CONFIG_PATH.exists():
     except Exception as exc:  # noqa: BLE001
         config_error = exc
 
-tabs = st.tabs(
-    ["📊 Dashboard", "📤 Carga SAP", "🚨 Alertas", "🗂️ Historial"]
-    if db is not None
-    else ["📊 Dashboard"]
+st.markdown(
+    """
+    <section class="upload-shell">
+      <div class="upload-head">
+        <div>
+          <h1 class="upload-title">Carga SAP</h1>
+          <p class="upload-subtitle">
+            Sube exportaciones MB51; al confirmar se recalcula el dashboard HTML.
+          </p>
+        </div>
+        <div class="upload-badge">Dashboard productivo</div>
+      </div>
+    </section>
+    """,
+    unsafe_allow_html=True,
 )
-tab_dash = tabs[0]
-if db is not None:
-    tab_carga, tab_alertas, tab_historial = tabs[1:]
 
-# ---------------------------------------------------------------- Dashboard
-with tab_dash:
-    if config_error is not None:
-        st.warning(
-            "No se pudo cargar config/project.yml. Se muestra solo el dashboard "
-            "publicado; las funciones de carga y alertas quedan deshabilitadas."
-        )
-        st.code(str(config_error))
-    elif not CONFIG_PATH.exists():
-        st.info(
-            "Modo dashboard publicado: config/project.yml no está versionado. "
-            "Las funciones de carga SAP, alertas e historial se habilitan en el "
-            "entorno local cuando existe ese archivo."
-        )
-
-    if DASHBOARD_PATH.exists():
-        components.html(
-            DASHBOARD_PATH.read_text(encoding="utf-8"), height=1400, scrolling=True
-        )
-    else:
-        st.info(
-            "Aún no existe reports/dashboard.html. Carga un archivo en la pestaña "
-            "'Carga SAP' y ejecuta el pipeline, o corre "
-            "`python -m granjas_anomalias.cli run --config config/project.yml`."
-        )
+if config_error is not None:
+    st.warning(
+        "No se pudo cargar config/project.yml. Se muestra solo el dashboard "
+        "publicado; la carga SAP queda deshabilitada."
+    )
+    st.code(str(config_error))
+    _mostrar_dashboard()
+    st.stop()
 
 if db is None or config is None:
+    st.info(
+        "Modo dashboard publicado: config/project.yml no está versionado. "
+        "La carga SAP se habilita cuando existe ese archivo."
+    )
+    _mostrar_dashboard()
     st.stop()
 
 from granjas_anomalias.ingestion import (  # noqa: E402
@@ -122,15 +177,7 @@ from granjas_anomalias.ingestion import (  # noqa: E402
     validar_archivo,
 )
 
-# ---------------------------------------------------------------- Carga SAP
-with tab_carga:
-    st.subheader("Carga de exportaciones SAP (MB51 crudo)")
-    st.caption(
-        "Formato soportado: exportación directa de MB51 (misma estructura que el "
-        "kardex del proyecto, hoja 'Data'). Los archivos crudos se conservan "
-        "intactos; recargar un archivo o un periodo traslapado no duplica movimientos."
-    )
-
+with st.container():
     minimo, maximo = db.rango_existente(str(config.project["center_id"]))
     if minimo:
         st.info(
@@ -142,9 +189,9 @@ with tab_carga:
             "El almacén incremental está vacío. Inicializa el histórico desde el "
             "kardex configurado antes de cargar incrementos."
         )
-        if st.button("Inicializar histórico desde config (kardex configurado)"):
+        if st.button("Inicializar histórico desde config"):
             kardex_path = config.resolve("kardex_excel")
-            with st.spinner(f"Ingiriendo {kardex_path.name}…"):
+            with st.spinner(f"Ingiriendo {kardex_path.name}..."):
                 resumen = ingerir_archivo(kardex_path, config, db, usuario="bootstrap")
             st.success(f"{resumen.estado}: {resumen.mensaje}")
             st.rerun()
@@ -200,16 +247,18 @@ with tab_carga:
             )
 
         validos = [(inf, r) for inf, r in zip(informes, rutas) if inf.valido]
-        st.markdown("### 2 · Confirmación")
         ejecutar = st.checkbox(
-            "Ejecutar pipeline completo al confirmar (recalcula indicadores, "
-            "anomalías, alertas y dashboard)",
+            "Ejecutar pipeline completo al confirmar",
             value=True,
+            help="Recalcula indicadores, alertas integradas y dashboard HTML.",
         )
-        if st.button(f"Confirmar carga de {len(validos)} archivo(s) válido(s)", disabled=not validos):
+        if st.button(
+            f"Confirmar carga de {len(validos)} archivo(s) válido(s)",
+            disabled=not validos,
+        ):
             resultados = []
             for informe, ruta in validos:
-                with st.spinner(f"Procesando {ruta.name}…"):
+                with st.spinner(f"Procesando {ruta.name}..."):
                     resumen = ingerir_archivo(ruta, config, db, usuario="dashboard")
                 resultados.append(
                     {
@@ -220,158 +269,18 @@ with tab_carga:
                         "detalle": resumen.mensaje,
                     }
                 )
-            st.markdown("### 3 · Resultado de la ingesta")
+            st.markdown("### Resultado de la ingesta")
             st.dataframe(pd.DataFrame(resultados), width="stretch")
 
             if ejecutar:
                 try:
-                    with st.spinner("Materializando kardex y ejecutando pipeline…"):
+                    with st.spinner("Materializando kardex y ejecutando pipeline..."):
                         materializar_kardex_cache(db, config)
                         _ejecutar_pipeline()
-                    st.success("Pipeline completado. Dashboard y alertas actualizados.")
+                    st.success("Pipeline completado. Dashboard actualizado.")
                     st.cache_resource.clear()
                 except Exception:  # noqa: BLE001
                     st.error("El pipeline falló; revisa logs/pipeline.log.")
                     st.code(traceback.format_exc())
 
-# ---------------------------------------------------------------- Alertas
-with tab_alertas:
-    st.subheader("Alertas consolidadas")
-    todas = db.leer_alertas()
-    if todas.empty:
-        st.info("Aún no hay alertas registradas. Ejecuta el pipeline al menos una vez.")
-    else:
-        ultimo_run = todas.sort_values("creado_en")["run_id"].iloc[-1]
-        vigentes = todas.loc[todas["run_id"].eq(ultimo_run)].copy()
-        revisiones = db.leer_revisiones()
-        if not revisiones.empty:
-            vigentes = vigentes.merge(
-                revisiones[["clave_seguimiento", "estado_manual", "comentario"]],
-                on="clave_seguimiento",
-                how="left",
-            )
-        else:
-            vigentes["estado_manual"] = pd.NA
-            vigentes["comentario"] = pd.NA
-        vigentes["estado_manual"] = vigentes["estado_manual"].fillna("PENDIENTE")
-        vigentes["comentario"] = vigentes["comentario"].fillna("")
-
-        c1, c2, c3, c4 = st.columns(4)
-        with c1:
-            filtro_sev = st.multiselect(
-                "Severidad", sorted(vigentes["severidad"].dropna().unique().tolist())
-            )
-        with c2:
-            filtro_fam = st.multiselect(
-                "Familia", sorted(vigentes["familia"].dropna().unique().tolist())
-            )
-        with c3:
-            filtro_estado = st.multiselect(
-                "Estado", sorted(vigentes["estado"].dropna().unique().tolist())
-            )
-        with c4:
-            filtro_tr = st.multiselect(
-                "Tipo de resultado",
-                sorted(vigentes["tipo_resultado"].dropna().unique().tolist()),
-            )
-
-        vista = vigentes
-        if filtro_sev:
-            vista = vista.loc[vista["severidad"].isin(filtro_sev)]
-        if filtro_fam:
-            vista = vista.loc[vista["familia"].isin(filtro_fam)]
-        if filtro_estado:
-            vista = vista.loc[vista["estado"].isin(filtro_estado)]
-        if filtro_tr:
-            vista = vista.loc[vista["tipo_resultado"].isin(filtro_tr)]
-
-        resumen_cols = st.columns(5)
-        for etiqueta, cuenta, col in [
-            ("Críticas", (vista["severidad"] == "critica").sum(), resumen_cols[0]),
-            ("Altas", (vista["severidad"] == "alta").sum(), resumen_cols[1]),
-            ("Nuevas", (vista["estado"] == "nueva").sum(), resumen_cols[2]),
-            ("Persistentes", (vista["estado"] == "persistente").sum(), resumen_cols[3]),
-            ("Resueltas", (vista["estado"] == "resuelta").sum(), resumen_cols[4]),
-        ]:
-            col.metric(etiqueta, int(cuenta))
-
-        columnas_vista = [
-            "severidad",
-            "estado",
-            "familia",
-            "tipo",
-            "tipo_resultado",
-            "caseta",
-            "material",
-            "cycle_id",
-            "fecha_inicial",
-            "fecha_final",
-            "valor_real",
-            "valor_esperado",
-            "diferencia_pct",
-            "capas",
-            "n_capas",
-            "motivo",
-            "recomendacion",
-            "estado_manual",
-            "comentario",
-            "clave_seguimiento",
-        ]
-        editable = st.data_editor(
-            vista[columnas_vista],
-            width="stretch",
-            hide_index=True,
-            disabled=[c for c in columnas_vista if c not in ("estado_manual", "comentario")],
-            column_config={
-                "estado_manual": st.column_config.SelectboxColumn(
-                    "Revisión manual", options=ESTADOS_MANUALES
-                ),
-                "comentario": st.column_config.TextColumn("Comentario"),
-                "clave_seguimiento": None,
-            },
-            key="editor_alertas",
-        )
-        if st.button("Guardar revisiones manuales"):
-            guardadas = 0
-            for _, fila in editable.iterrows():
-                original = vigentes.loc[
-                    vigentes["clave_seguimiento"].eq(fila["clave_seguimiento"])
-                ].iloc[0]
-                if (
-                    fila["estado_manual"] != original["estado_manual"]
-                    or fila["comentario"] != original["comentario"]
-                ):
-                    db.guardar_revision(
-                        fila["clave_seguimiento"],
-                        str(fila["estado_manual"]),
-                        str(fila["comentario"]),
-                        usuario="dashboard",
-                    )
-                    guardadas += 1
-            st.success(f"{guardadas} revisión(es) guardada(s).")
-
-        st.download_button(
-            "Descargar alertas filtradas (CSV)",
-            vista.to_csv(index=False).encode("utf-8-sig"),
-            file_name="alertas_filtradas.csv",
-            mime="text/csv",
-        )
-
-# ---------------------------------------------------------------- Historial
-with tab_historial:
-    st.subheader("Historial de cargas")
-    cargas = db.listar_cargas()
-    if cargas.empty:
-        st.info("No hay cargas registradas.")
-    else:
-        st.dataframe(cargas, width="stretch")
-
-    st.subheader("Ejecuciones del pipeline")
-    with db.connect() as conn:
-        ejecuciones = pd.read_sql_query(
-            "SELECT * FROM ejecuciones ORDER BY iniciado_en DESC", conn
-        )
-    if ejecuciones.empty:
-        st.info("No hay ejecuciones registradas.")
-    else:
-        st.dataframe(ejecuciones, width="stretch")
+_mostrar_dashboard()
