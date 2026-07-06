@@ -11,13 +11,12 @@
       --green: #266041;
       --green-light: #88BD54;
       --red: #DC0814;
-      --yellow: #FDC600;
       --surface: #FFFFFF;
       --surface-blue: #F2FBFE;
       --border: #CBEAF4;
       --text: #12335E;
       --soft: #315B7F;
-      --shadow: 0 16px 38px rgba(26, 66, 138, .12);
+      --shadow: 0 14px 34px rgba(26, 66, 138, .11);
     }
     * { box-sizing: border-box; }
     html, body {
@@ -27,20 +26,11 @@
       background: #eef7fb;
       color: var(--text);
     }
-    body { padding: 10px; overflow-x: hidden; }
+    body { padding: 8px; overflow-x: hidden; }
     .shell {
-      display: grid;
-      grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-      gap: 12px;
-      align-items: stretch;
       width: 100%;
-    }
-    .side {
-      position: sticky;
-      top: 10px;
-      align-self: start;
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
     .card, .dashboard-card {
       background: var(--surface);
@@ -48,119 +38,204 @@
       border-radius: 18px;
       box-shadow: var(--shadow);
     }
-    .card { padding: 14px; }
-    .eyebrow {
-      color: var(--green);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0;
-      text-transform: uppercase;
-      margin-bottom: 5px;
+    .upload-dock {
+      overflow: hidden;
     }
-    h1 {
-      color: var(--blue-dark);
-      font-size: 25px;
-      line-height: 1.05;
-      margin: 0 0 7px;
-    }
-    .copy {
-      color: var(--soft);
-      font-size: 13px;
-      line-height: 1.35;
-      margin: 0;
-    }
-    .dev-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 12px;
-    }
-    .dev-badge {
-      border: 1px solid #9bdaf2;
-      border-radius: 999px;
-      background: var(--surface-blue);
-      color: var(--blue-dark);
-      font-size: 11px;
-      font-weight: 900;
-      padding: 6px 8px;
-    }
-    .history {
+    .dock-summary {
+      min-height: 58px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: auto minmax(180px, 1fr) minmax(160px, .45fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
     }
-    .metric {
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: var(--surface-blue);
-      padding: 9px;
+    .dock-toggle {
+      min-height: 38px;
+      border: 1px solid var(--blue-dark);
+      border-radius: 12px;
+      background: var(--blue-dark);
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+    .dock-toggle span {
+      display: inline-block;
+      margin-left: 5px;
+      transition: transform .2s ease;
+    }
+    .upload-dock.open .dock-toggle span { transform: rotate(180deg); }
+    .dock-title {
+      display: grid;
+      gap: 2px;
       min-width: 0;
     }
-    .metric span {
-      display: block;
-      color: var(--green);
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-    .metric strong {
-      display: block;
+    .dock-title strong {
       color: var(--blue-dark);
-      font-size: 13px;
-      margin-top: 4px;
-      overflow-wrap: anywhere;
+      font-size: 14px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dock-title small {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dock-progress {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8f3f8;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--green-light) 100%);
+      transition: width .25s ease;
+    }
+    .progress-text {
+      color: var(--soft);
+      font-size: 10px;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .mini-upload {
+      position: relative;
+      min-height: 38px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--blue);
+      border-radius: 12px;
+      background: var(--surface-blue);
+      color: var(--blue-dark);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+    .mini-upload.disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .mini-upload input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .mini-upload.disabled input { cursor: not-allowed; }
+    .dock-panel {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff 0%, #f7fdff 100%);
+      padding: 11px;
+    }
+    .upload-dock.open .dock-panel { display: block; }
+    .dock-grid {
+      display: grid;
+      grid-template-columns: minmax(240px, .9fr) minmax(250px, 1fr) minmax(270px, 1.1fr);
+      gap: 10px;
+      align-items: stretch;
     }
     .dropzone {
-      position: relative;
       display: grid;
       place-items: center;
-      min-height: 160px;
-      padding: 16px;
+      min-height: 136px;
+      padding: 12px;
       border: 2px dashed var(--blue);
       border-radius: 16px;
-      background: linear-gradient(180deg, #FFFFFF 0%, #F5FCFF 100%);
+      background: #fff;
       cursor: pointer;
-      transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
       text-align: center;
+      transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
     }
     .dropzone:hover, .dropzone.dragover {
       border-color: var(--green-light);
       transform: translateY(-1px);
       box-shadow: 0 10px 24px rgba(0, 178, 227, .14);
     }
-    .dropzone input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-    }
     .upload-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      width: 38px;
+      height: 38px;
       display: grid;
       place-items: center;
-      margin: 0 auto 9px;
+      margin: 0 auto 8px;
+      border-radius: 12px;
       background: var(--blue-dark);
       color: white;
+      font-size: 20px;
       font-weight: 900;
-      font-size: 22px;
     }
     .drop-title {
       color: var(--blue-dark);
       font-size: 14px;
       font-weight: 900;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
-    .drop-note {
+    .drop-note, .copy {
       color: var(--soft);
       font-size: 11px;
-      line-height: 1.25;
+      line-height: 1.3;
+    }
+    .panel-card {
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: #fff;
+      padding: 10px;
+      min-width: 0;
+    }
+    .section-label {
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .history {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-blue);
+      padding: 8px;
+      min-width: 0;
+    }
+    .metric span {
+      display: block;
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .metric strong {
+      display: block;
+      color: var(--blue-dark);
+      font-size: 12px;
+      margin-top: 3px;
+      overflow-wrap: anywhere;
     }
     .file-list {
       display: grid;
       gap: 6px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .file-item {
       display: flex;
@@ -168,8 +243,8 @@
       gap: 8px;
       align-items: center;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 8px 9px;
+      border-radius: 11px;
+      padding: 7px 8px;
       background: #fff;
       color: var(--blue-dark);
       font-size: 11px;
@@ -182,20 +257,20 @@
     }
     .toggle-row {
       display: flex;
-      gap: 8px;
+      gap: 7px;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 9px;
       color: var(--soft);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
     }
     .toggle-row input { accent-color: var(--blue-dark); }
     .action {
       width: 100%;
-      margin-top: 10px;
-      min-height: 42px;
+      margin-top: 9px;
+      min-height: 38px;
       border: 1px solid var(--blue-dark);
-      border-radius: 13px;
+      border-radius: 12px;
       background: var(--blue-dark);
       color: white;
       font-weight: 900;
@@ -206,26 +281,6 @@
       background: #e8eef5;
       color: #8794a6;
       cursor: not-allowed;
-    }
-    .progress-track {
-      width: 100%;
-      height: 10px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: #e8f3f8;
-      margin-top: 12px;
-    }
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--blue) 0%, var(--green-light) 100%);
-      transition: width .25s ease;
-    }
-    .progress-text {
-      margin-top: 7px;
-      color: var(--soft);
-      font-size: 11px;
-      font-weight: 800;
     }
     .status-title {
       color: var(--blue-dark);
@@ -246,13 +301,13 @@
     .mini-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 9px;
       overflow: hidden;
-      border-radius: 12px;
-      font-size: 11px;
+      border-radius: 11px;
+      font-size: 10px;
     }
     .mini-table th, .mini-table td {
-      padding: 7px 8px;
+      padding: 6px 7px;
       border-bottom: 1px solid var(--border);
       text-align: left;
       vertical-align: top;
@@ -280,8 +335,8 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
-      margin-bottom: 8px;
+      padding: 10px 13px;
+      margin-bottom: 7px;
     }
     .dashboard-head h2 {
       color: var(--blue-dark);
@@ -293,6 +348,20 @@
       font-size: 12px;
       margin: 2px 0 0;
     }
+    .dev-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .dev-badge {
+      border: 1px solid #9bdaf2;
+      border-radius: 999px;
+      background: var(--surface-blue);
+      color: var(--blue-dark);
+      font-size: 11px;
+      font-weight: 900;
+      padding: 6px 8px;
+    }
     .dashboard-frame {
       width: 100%;
       height: 1580px;
@@ -302,61 +371,75 @@
     }
     @media (max-width: 980px) {
       body { padding: 6px; }
-      .shell { grid-template-columns: 1fr; }
-      .side { position: static; }
+      .dock-summary {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+      .dock-progress, .mini-upload {
+        grid-column: 1 / -1;
+      }
+      .dock-grid { grid-template-columns: 1fr; }
+      .dashboard-head { align-items: flex-start; flex-direction: column; }
       .dashboard-frame { height: 1450px; }
     }
   </style>
 </head>
 <body>
   <main class="shell">
-    <aside class="side">
-      <section class="card">
-        <div class="eyebrow">Entrada de datos</div>
-        <h1>Carga SAP</h1>
-        <p class="copy">Sube exportaciones MB51. El host procesa Python por detras y regresa el dashboard HTML actualizado.</p>
-        <div class="dev-row" aria-label="Herramientas del dashboard">
-          <span class="dev-badge">HTML</span>
-          <span class="dev-badge">CSS</span>
-          <span class="dev-badge">JS</span>
+    <section class="upload-dock card" id="uploadDock">
+      <div class="dock-summary">
+        <button class="dock-toggle" id="dockToggle" type="button" aria-expanded="false">
+          Carga SAP <span>⌄</span>
+        </button>
+        <div class="dock-title">
+          <strong id="dockTitle">Esperando archivo SAP</strong>
+          <small id="dockSubtitle">El dashboard actual se mantiene visible.</small>
         </div>
-      </section>
-
-      <section class="card">
-        <div class="history" id="historyBox"></div>
-      </section>
-
-      <section class="card">
-        <label class="dropzone" id="dropzone">
+        <div class="dock-progress" aria-label="Progreso de carga">
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">Sin carga activa</div>
+        </div>
+        <label class="mini-upload" id="miniUpload">
+          Subir archivo
           <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple />
-          <div>
-            <div class="upload-icon">+</div>
-            <div class="drop-title">Arrastra o selecciona archivo</div>
-            <div class="drop-note">XLSX, XLS o CSV de SAP MB51</div>
-          </div>
         </label>
-        <div class="file-list" id="fileList"></div>
-        <label class="toggle-row">
-          <input id="executePipeline" type="checkbox" checked />
-          Recalcular dashboard al confirmar
-        </label>
-        <button class="action" id="sendBtn" disabled>Validar y actualizar</button>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="progress-text" id="progressText">Esperando archivo SAP</div>
-      </section>
+      </div>
 
-      <section class="card" id="statusCard">
-        <p class="status-title" id="statusTitle">Esperando archivo SAP</p>
-        <p class="status-message" id="statusMessage">Carga una exportacion MB51 para actualizar el dashboard.</p>
-        <div id="statusDetails"></div>
-      </section>
-    </aside>
+      <div class="dock-panel" id="dockPanel">
+        <div class="dock-grid">
+          <div class="dropzone" id="dropzone" role="button" tabindex="0">
+            <div>
+              <div class="upload-icon">+</div>
+              <div class="drop-title">Arrastra archivo SAP</div>
+              <div class="drop-note">XLSX, XLS o CSV de MB51</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="section-label">Contexto</div>
+            <div class="history" id="historyBox"></div>
+            <div class="file-list" id="fileList"></div>
+            <label class="toggle-row">
+              <input id="executePipeline" type="checkbox" checked />
+              Recalcular dashboard al confirmar
+            </label>
+            <button class="action" id="sendBtn" disabled>Validar y actualizar</button>
+          </div>
+
+          <div class="panel-card" id="statusCard">
+            <div class="section-label">Estado</div>
+            <p class="status-title" id="statusTitle">Esperando archivo SAP</p>
+            <p class="status-message" id="statusMessage">Carga una exportacion MB51 para actualizar el dashboard.</p>
+            <div id="statusDetails"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section>
       <div class="dashboard-head card">
         <div>
           <h2>Dashboard productivo</h2>
-          <p>Alertas, controles y navegacion operativa viven dentro del HTML.</p>
+          <p>La carga no tapa el tablero; solo se despliega cuando hay archivo o resultado.</p>
         </div>
         <div class="dev-row" aria-hidden="true">
           <span class="dev-badge">HTML</span>
@@ -413,6 +496,12 @@
       }
       return String(hash);
     }
+    function setDockOpen(open) {
+      const dock = $("uploadDock");
+      dock.classList.toggle("open", Boolean(open));
+      $("dockToggle").setAttribute("aria-expanded", String(Boolean(open)));
+      setFrameHeight();
+    }
     function setProgress(value, text) {
       $("progressFill").style.width = `${Math.max(0, Math.min(100, value))}%`;
       $("progressText").textContent = text;
@@ -432,16 +521,22 @@
         <div class="metric"><span>Inicio</span><strong>${escapeHtml(history.min_date || "-")}</strong></div>
         <div class="metric"><span>Ultima fecha</span><strong>${escapeHtml(history.max_date || "-")}</strong></div>`;
     }
+    function shouldOpenForStatus(stage, validations, results) {
+      if (stage === "idle" || stage === "readonly") return false;
+      return Boolean((validations && validations.length) || (results && results.length) || stage === "error" || stage === "config_error");
+    }
     function renderStatus(status) {
       const current = status || {};
       const stage = current.stage || "idle";
-      $("statusCard").className = `card status-${stage}`;
-      $("statusTitle").textContent = current.title || "Esperando archivo SAP";
-      $("statusMessage").textContent = current.message || "";
-      setProgress(Number(current.progress || 0), current.title || "Esperando archivo SAP");
-
       const validations = Array.isArray(current.validations) ? current.validations : [];
       const results = Array.isArray(current.results) ? current.results : [];
+      $("statusCard").className = `panel-card status-${stage}`;
+      $("statusTitle").textContent = current.title || "Esperando archivo SAP";
+      $("statusMessage").textContent = current.message || "";
+      $("dockTitle").textContent = current.title || "Esperando archivo SAP";
+      $("dockSubtitle").textContent = current.message || "El dashboard actual se mantiene visible.";
+      setProgress(Number(current.progress || 0), current.title || "Sin carga activa");
+
       const validationRows = validations.slice(0, 6).map(row => `
         <tr>
           <td>${escapeHtml(row.archivo)}</td>
@@ -463,6 +558,7 @@
         ${resultRows ? `<table class="mini-table"><thead><tr><th>Archivo</th><th>Estado</th><th>Insertados</th></tr></thead><tbody>${resultRows}</tbody></table>` : ""}
         ${errors.length ? `<div class="detail">${errors.map(escapeHtml).join("<br>")}</div>` : ""}
       `;
+      if (shouldOpenForStatus(stage, validations, results)) setDockOpen(true);
       setFrameHeight();
     }
     function renderDashboard(html) {
@@ -472,13 +568,21 @@
       $("dashboardFrame").srcdoc = html || "<h1>Dashboard no disponible</h1>";
     }
     function renderFileList() {
-      $("sendBtn").disabled = state.files.length === 0 || !state.args.config_ready;
+      const configReady = Boolean(state.args.config_ready);
+      $("sendBtn").disabled = state.files.length === 0 || !configReady;
+      $("fileInput").disabled = !configReady;
+      $("miniUpload").classList.toggle("disabled", !configReady);
       $("fileList").innerHTML = state.files.map(file => `
         <div class="file-item">
           <span>${escapeHtml(file.name)}</span>
           <small>${formatBytes(file.size)}</small>
         </div>`).join("");
-      if (state.files.length) setProgress(18, `${state.files.length} archivo(s) listo(s) para enviar`);
+      if (state.files.length) {
+        $("dockTitle").textContent = `${state.files.length} archivo(s) seleccionado(s)`;
+        $("dockSubtitle").textContent = "Revisa validacion y confirma para actualizar.";
+        setProgress(18, `${state.files.length} archivo(s) listo(s) para enviar`);
+        setDockOpen(true);
+      }
       setFrameHeight();
     }
     function readFileAsDataUrl(file) {
@@ -492,6 +596,7 @@
     async function sendFiles() {
       if (!state.files.length || !state.args.config_ready) return;
       $("sendBtn").disabled = true;
+      setDockOpen(true);
       setProgress(28, "Leyendo archivo en navegador");
       try {
         const files = [];
@@ -516,12 +621,23 @@
         setProgress(100, "Error de lectura");
       }
     }
+    function updateFiles(fileList) {
+      state.files = Array.from(fileList || []);
+      renderFileList();
+    }
     function setupUploader() {
       const input = $("fileInput");
       const dropzone = $("dropzone");
-      input.addEventListener("change", event => {
-        state.files = Array.from(event.target.files || []);
-        renderFileList();
+      $("dockToggle").addEventListener("click", () => {
+        setDockOpen(!$("uploadDock").classList.contains("open"));
+      });
+      input.addEventListener("change", event => updateFiles(event.target.files));
+      dropzone.addEventListener("click", () => input.click());
+      dropzone.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          input.click();
+        }
       });
       dropzone.addEventListener("dragover", event => {
         event.preventDefault();
@@ -531,9 +647,7 @@
       dropzone.addEventListener("drop", event => {
         event.preventDefault();
         dropzone.classList.remove("dragover");
-        state.files = Array.from(event.dataTransfer.files || []);
-        input.files = event.dataTransfer.files;
-        renderFileList();
+        updateFiles(event.dataTransfer.files);
       });
       $("sendBtn").addEventListener("click", sendFiles);
     }
