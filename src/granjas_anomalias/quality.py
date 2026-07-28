@@ -98,7 +98,7 @@ Las combinaciones no clasificadas no se eliminan. Se exportan para validación c
 - `reports/tables/03_movimientos_no_clasificados.csv`
 - `reports/tables/04_nulos_llaves_sap.csv`
 """
-    report_path = config.root / "reports" / "CALIDAD_DATOS.md"
+    report_path = config.resolve("reports_dir") / "CALIDAD_DATOS.md"
     report_path.write_text(report, encoding="utf-8")
     outputs["reporte_calidad"] = report_path
     return outputs

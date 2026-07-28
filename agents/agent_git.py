@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import subprocess
 
-from .base import ROOT, BaseAgent
+from .base import ROOT, BaseAgent, active_config
 
 RAMA_ESPERADA = "deploy-dashboard-chencopo"
+FARM_PREFIX = active_config().farm_root.relative_to(ROOT).as_posix()
 
 ARCHIVOS_SENSIBLES = [
     ("config/project.yml", "Configuración con identificadores reales (centro, materiales, almacenes)."),
-    ("reports/dashboard.html", "Dashboard con payload de datos operativos reales embebido."),
-    ("data/warehouse.db", "Base operacional con movimientos reales."),
+    (f"{FARM_PREFIX}/reports/dashboard.html", "Dashboard con datos operativos reales."),
+    (f"{FARM_PREFIX}/data/warehouse.db", "Base operacional con movimientos reales."),
     (".env", "Variables de entorno."),
 ]
 
@@ -85,7 +86,9 @@ class AgenteGit(BaseAgent):
                     confidence=0.95,
                 )
 
-        manifests = [f for f in trackeados if f.startswith("outputs/")]
+        manifests = [
+            f for f in trackeados if f.startswith(f"{FARM_PREFIX}/outputs/")
+        ]
         if manifests:
             self.finding(
                 "medium",

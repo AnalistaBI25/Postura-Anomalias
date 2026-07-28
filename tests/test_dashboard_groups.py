@@ -9,6 +9,7 @@ def _config() -> ProjectConfig:
         root=Path("."),
         raw={
             "project": {
+                "farm_id": "test-farm",
                 "center_id": "1217",
                 "farm_name": "GRANJA PRUEBA",
                 "timezone": "America/Merida",

@@ -135,6 +135,6 @@ El score es una **señal de revisión**, no una conclusión de fraude, error ope
 
 Revisar primero `data/processed/anomalias_consumo.csv`, priorizando severidad crítica y alta. Agregar una columna de etiqueta validada para preparar la fase supervisada.
 """
-    path = config.root / "reports" / "EDA_Y_ANOMALIAS.md"
+    path = config.resolve("reports_dir") / "EDA_Y_ANOMALIAS.md"
     path.write_text(report, encoding="utf-8")
     return path

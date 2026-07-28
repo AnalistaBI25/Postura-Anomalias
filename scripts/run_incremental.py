@@ -46,7 +46,7 @@ def main() -> int:
     args = parser.parse_args()
 
     config = load_config(args.config)
-    db = Warehouse(config.root / config.ingestion.get("db_path", "data/warehouse.db"))
+    db = Warehouse(config.resolve_ingestion("db_path", "data/warehouse.db"))
 
     entradas = [Path(p) for p in args.input]
     if args.bootstrap:

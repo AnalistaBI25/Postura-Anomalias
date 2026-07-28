@@ -6,7 +6,7 @@ import importlib
 import re
 import sys
 
-from .base import ROOT, BaseAgent
+from .base import ROOT, BaseAgent, farm_path
 
 IMPORT_POR_PAQUETE = {
     "pandas": "pandas",
@@ -72,7 +72,7 @@ class AgenteDespliegue(BaseAgent):
                     f"Falta {archivo}, requerido para `streamlit run streamlit_app.py`.",
                     file=archivo,
                 )
-        if (ROOT / "reports" / "dashboard.html").exists():
+        if farm_path("reports", "dashboard.html").exists():
             self.finding(
                 "info",
                 "reports/dashboard.html presente: la app abre en modo consulta aunque la "
@@ -106,7 +106,7 @@ class AgenteDespliegue(BaseAgent):
             )
 
         # 5) Rollback y persistencia
-        if (ROOT / "outputs" / "history").exists():
+        if farm_path("outputs", "history").exists():
             self.finding(
                 "info",
                 "Existe outputs/history/<año>/<mes>/run_* con manifiestos por ejecución "

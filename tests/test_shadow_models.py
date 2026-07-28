@@ -11,7 +11,7 @@ def _config() -> ProjectConfig:
     return ProjectConfig(
         root=Path("."),
         raw={
-            "project": {},
+            "project": {"farm_id": "test-farm"},
             "paths": {},
             "sap": {},
             "stock": {},
@@ -87,4 +87,3 @@ def test_shadow_models_flag_injected_extremes() -> None:
             result.loc[index, "flag_iforest_segmentado"]
             or result.loc[index, "flag_lof"]
         )
-

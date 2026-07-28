@@ -14,7 +14,7 @@ def _config(tmp_path: Path, mode: str) -> ProjectConfig:
     return ProjectConfig(
         root=tmp_path,
         raw={
-            "project": {},
+            "project": {"farm_id": "test-farm"},
             "paths": {},
             "sap": {},
             "stock": {},
@@ -70,14 +70,22 @@ def test_score_existing_missing_model_does_not_train(tmp_path: Path) -> None:
     assert scored["score_ml"].eq(0).all()
     assert scored["flag_ml"].eq(False).all()
     assert scored["modelo_estado"].eq("MODEL_MISSING").all()
-    assert not (tmp_path / "models" / "test_iforest.joblib").exists()
+    assert not (
+        tmp_path / "farms" / "test-farm" / "models" / "test_iforest.joblib"
+    ).exists()
 
 
 def test_train_mode_writes_versioned_metadata(tmp_path: Path) -> None:
     config = _config(tmp_path, "train")
     scored, model_path = apply_isolation_forest(_model_data(), config)
 
-    metadata_path = tmp_path / "models" / "test_iforest_metadata.json"
+    metadata_path = (
+        tmp_path
+        / "farms"
+        / "test-farm"
+        / "models"
+        / "test_iforest_metadata.json"
+    )
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
 
     assert model_path is not None and model_path.exists()

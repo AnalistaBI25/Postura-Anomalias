@@ -465,7 +465,7 @@ def validar_archivo(
 # Ingesta
 # ----------------------------------------------------------------------
 def _copiar_inmutable(path: Path, config: ProjectConfig, carga_id: str) -> Path:
-    destino_dir = config.root / config.ingestion.get("raw_archive_dir", "data/raw/cargas")
+    destino_dir = config.resolve_ingestion("raw_archive_dir", "data/raw/cargas")
     destino_dir.mkdir(parents=True, exist_ok=True)
     destino = destino_dir / f"{carga_id}_{path.name}"
     if not destino.exists():
@@ -514,7 +514,7 @@ def ingerir_archivo(
     }
 
     if not informe.valido:
-        rechazados = config.root / config.ingestion.get("rejected_dir", "data/rejected")
+        rechazados = config.resolve_ingestion("rejected_dir", "data/rejected")
         rechazados.mkdir(parents=True, exist_ok=True)
         try:
             shutil.copy2(path, rechazados / f"{carga_id}_{path.name}")

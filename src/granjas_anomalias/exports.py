@@ -33,7 +33,7 @@ def exportar_salidas(
     weekly: pd.DataFrame,
     manifest: dict,
 ) -> dict[str, Path]:
-    outputs_dir = config.root / "outputs"
+    outputs_dir = config.resolve("outputs_dir")
     latest = outputs_dir / "latest"
     dashboard = outputs_dir / "dashboard"
     rutas: dict[str, Path] = {}

@@ -26,7 +26,7 @@ def main() -> int:
     args = parser.parse_args()
 
     config = load_config(args.config)
-    db = Warehouse(config.root / config.ingestion.get("db_path", "data/warehouse.db"))
+    db = Warehouse(config.resolve_ingestion("db_path", "data/warehouse.db"))
     informe = validar_archivo(args.input, config, db)
 
     print(json.dumps(informe.resumen(), indent=2, ensure_ascii=False))

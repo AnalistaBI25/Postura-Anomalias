@@ -23,7 +23,7 @@ from .agent_git import AgenteGit
 from .agent_pruebas import AgentePruebas
 from .agent_rendimiento import AgenteRendimiento
 from .agent_seguridad import AgenteSeguridad
-from .base import ROOT, guardar_reporte
+from .base import farm_path, guardar_reporte
 
 ORDEN_SEVERIDAD = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
 
@@ -59,7 +59,7 @@ def main() -> int:
     args = parser.parse_args()
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    salida = ROOT / "reports" / "agentes" / timestamp
+    salida = farm_path("reports", "agentes", timestamp)
     reportes, hallazgos = [], []
 
     for clave, cls in AGENTES.items():

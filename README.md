@@ -32,6 +32,23 @@ La Fase 1 ya implementa:
 - dashboard HTML con Chart.js y payload embebido;
 - reportes, tablas de control, logs, manifiesto y pruebas automatizadas.
 
+## Separación por granja
+
+La conversión multi-granja usa `project.farm_id` como identificador técnico.
+Los datos, la base SQLite, los modelos, reportes, salidas y logs de cada granja
+se guardan bajo `farms/<farm_id>/`; el código y las reglas continúan siendo
+compartidos.
+
+Para Chencopo, la configuración activa usa `farm_id: chencopo_2` y el dashboard
+se genera en `farms/chencopo_2/reports/dashboard.html`.
+
+La guía completa de estructura, ejecución, validación y preparación de otra
+granja está en
+[docs/GUIA_PROYECTO_MULTI_GRANJA.md](docs/GUIA_PROYECTO_MULTI_GRANJA.md).
+
+Las rutas cortas como `data/processed` o `reports/` que aparecen en documentos
+anteriores deben leerse como rutas relativas a `farms/<farm_id>/`.
+
 ## Arquitectura general
 
 ```text
@@ -56,7 +73,7 @@ el resultado se **incrusta** en un único HTML que el navegador consume del lado
 del cliente.
 
 **1. Fuentes (entrada).** Exportaciones SAP y maestros productivos en
-`data/raw/`, declarados en `config/project.yml`:
+`farms/<farm_id>/data/raw/`, declarados en `config/project.yml`:
 
 - **Kárdex MB51** — movimientos de inventario (entradas, consumo, traspasos,
   ajustes, mermas, logística).
@@ -74,12 +91,13 @@ semanal → stock global de alimento → *features* → reglas explicables + bas
 no supervisado (`IsolationForest`) que produce el **score de anomalía**.
 
 **3. Artefactos (salida).** El pipeline escribe CSV intermedios trazables
-(`data/interim`, `data/processed`), reportes, el modelo y un
-`reports/run_manifest.json`. Para el dashboard, `dashboard_payload.py` construye
+(`farms/<farm_id>/data/interim`, `farms/<farm_id>/data/processed`), reportes,
+el modelo y un `farms/<farm_id>/reports/run_manifest.json`. Para el dashboard,
+`dashboard_payload.py` construye
 un **payload JSON** (ciclos, línea diaria, stock compartido, anomalías) que
 `dashboard.py` inyecta en la plantilla reemplazando los marcadores
 `__PAYLOAD_JSON__` (datos) y `__LOGO_DATA_URI__` (logo base64). El resultado,
-`reports/dashboard.html`, es **autocontenido y portable**.
+`farms/<farm_id>/reports/dashboard.html`, es **autocontenido y portable**.
 
 **4. Consumo en el frontend.** El navegador abre el HTML; el payload viaja
 embebido como literal JavaScript (`const PAYLOAD = {…}`). Toda la lógica de

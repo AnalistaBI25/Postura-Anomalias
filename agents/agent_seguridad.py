@@ -6,12 +6,13 @@ import re
 import subprocess
 import urllib.request
 
-from .base import ROOT, BaseAgent
+from .base import ROOT, BaseAgent, active_config
 
 PATRONES_SECRETO = re.compile(
     r"(api[_-]?key|secret|token|password|contrase|aws_access|private[_-]?key)\s*[:=]\s*['\"][^'\"]{8,}",
     re.IGNORECASE,
 )
+FARM_PREFIX = active_config().farm_root.relative_to(ROOT).as_posix()
 
 
 def _git(*args: str) -> str:
@@ -39,7 +40,10 @@ class AgenteSeguridad(BaseAgent):
         trackeados = set(_git("ls-files").splitlines())
         sensibles = [
             a
-            for a in ("config/project.yml", "reports/dashboard.html")
+            for a in (
+                "config/project.yml",
+                f"{FARM_PREFIX}/reports/dashboard.html",
+            )
             if a in trackeados
         ]
         if publico and sensibles:

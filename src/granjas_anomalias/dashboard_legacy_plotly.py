@@ -100,6 +100,6 @@ header{{background:#1a428a;color:white;padding:20px;border-radius:14px}}
 <div class="panel">{fig_anomalies.to_html(full_html=False, include_plotlyjs=False)}</div>
 <div class="panel"><h2>Top 50 señales para revisión</h2>{table}</div>
 </body></html>"""
-    path = config.root / "reports" / "dashboard.html"
+    path = config.resolve("reports_dir") / "dashboard.html"
     path.write_text(html, encoding="utf-8")
     return path

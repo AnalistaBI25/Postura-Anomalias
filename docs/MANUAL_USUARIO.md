@@ -1,6 +1,7 @@
 # Manual de usuario · Dashboard productivo CRÍO
 
-Guía para **leer y operar el dashboard** (`reports/dashboard.html`). No requiere
+Guía para **leer y operar el dashboard**
+(`farms/<farm_id>/reports/dashboard.html`). No requiere
 conocimientos de programación. Para regenerarlo o cargar otra granja, ver la
 sección [Generar o actualizar el dashboard](#7-generar-o-actualizar-el-dashboard)
 y el [Runbook operativo](runbook.md).
@@ -30,7 +31,7 @@ se analizan **por caseta**.
 
 ## 2. Cómo abrirlo
 
-1. Abre el archivo `reports/dashboard.html` con doble clic (Chrome, Edge o
+1. Abre `farms/<farm_id>/reports/dashboard.html` con doble clic (Chrome, Edge o
    Firefox actualizados).
 2. No necesita conexión a internet salvo la primera carga de las librerías de
    gráficas (Chart.js) desde su CDN; con internet la primera vez, luego funciona.

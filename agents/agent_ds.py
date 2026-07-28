@@ -12,16 +12,16 @@ import sys
 
 import pandas as pd
 
-from .base import ROOT, BaseAgent
+from .base import ROOT, BaseAgent, active_config, farm_path
 
 sys.path.insert(0, str(ROOT / "src"))
 
-from granjas_anomalias.config import load_config  # noqa: E402
 from granjas_anomalias.utils import parse_dates, parse_sap_number  # noqa: E402
 
-CACHE = ROOT / "data" / "cache" / "kardex_mb51_chencopo_2024_2026.csv"
-PROCESSED = ROOT / "data" / "processed"
-PAYLOAD = ROOT / "reports" / "dashboard_payload_debug.json"
+CACHE = farm_path("data", "cache", "kardex_mb51_chencopo_2024_2026.csv")
+PROCESSED = farm_path("data", "processed")
+INTERIM = farm_path("data", "interim")
+PAYLOAD = farm_path("reports", "dashboard_payload_debug.json")
 
 TOL_REL = 0.01  # 1% de tolerancia relativa
 
@@ -71,7 +71,7 @@ class AgenteDS(BaseAgent):
         if not CACHE.exists():
             self.finding("high", "No existe el kardex cache; sin base para validar.")
             return
-        config = load_config(ROOT / "config" / "project.yml")
+        config = active_config()
         sap = config.sap
 
         raw = pd.read_csv(CACHE, low_memory=False)
@@ -122,7 +122,7 @@ class AgenteDS(BaseAgent):
 
         # 1) Volumen y dimensiones vs kardex normalizado (01)
         k01 = pd.read_csv(
-            ROOT / "data" / "interim" / "01_kardex_normalizado_clasificado.csv",
+            INTERIM / "01_kardex_normalizado_clasificado.csv",
             low_memory=False,
         )
         self._comparar(

@@ -22,7 +22,6 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "src"))
 
 CONFIG_PATH = ROOT / "config" / "project.yml"
-DASHBOARD_PATH = ROOT / "reports" / "dashboard.html"
 SHELL_COMPONENT_DIR = ROOT / "streamlit_components" / "dashboard_shell"
 
 st.set_page_config(
@@ -62,7 +61,7 @@ def _cargar_config():
 def _warehouse(config) -> Any:
     from granjas_anomalias.db import Warehouse
 
-    return Warehouse(config.root / config.ingestion.get("db_path", "data/warehouse.db"))
+    return Warehouse(config.resolve_ingestion("db_path", "data/warehouse.db"))
 
 
 def _ejecutar_pipeline() -> dict:
@@ -71,15 +70,17 @@ def _ejecutar_pipeline() -> dict:
     return run_pipeline(CONFIG_PATH)
 
 
-def _dashboard_html() -> str:
-    if DASHBOARD_PATH.exists():
-        return DASHBOARD_PATH.read_text(encoding="utf-8")
+def _dashboard_html(config: Any | None) -> str:
+    if config is not None:
+        dashboard_path = config.resolve("reports_dir") / "dashboard.html"
+        if dashboard_path.exists():
+            return dashboard_path.read_text(encoding="utf-8")
     return """
     <!doctype html>
     <html lang="es">
     <body style="font-family:Arial,sans-serif;background:#f2fbfe;color:#173f8a;margin:0;padding:32px">
       <h1>Dashboard pendiente</h1>
-      <p>Sube un archivo SAP y ejecuta el pipeline para generar reports/dashboard.html.</p>
+      <p>Sube un archivo SAP y ejecuta el pipeline para generar el dashboard de esta granja.</p>
     </body>
     </html>
     """
@@ -91,6 +92,7 @@ def _history_status(config: Any | None, db: Any | None) -> dict[str, Any]:
     minimo, maximo = db.rango_existente(str(config.project["center_id"]))
     return {
         "ready": True,
+        "farm_id": config.farm_id,
         "center_id": str(config.project["center_id"]),
         "farm_name": str(config.project.get("farm_name", "")),
         "min_date": minimo,
@@ -102,8 +104,14 @@ def _model_status(config: Any | None) -> dict[str, Any]:
     if config is None:
         return {"ready": False, "mode": "readonly"}
     lifecycle = config.raw.get("model_lifecycle", {}) or {}
-    model_path = (config.root / lifecycle.get("active_model_path", "models/isolation_forest_consumo.joblib")).resolve()
-    metadata_path = (config.root / lifecycle.get("metadata_path", "models/isolation_forest_metadata.json")).resolve()
+    model_path = config.resolve_model_lifecycle(
+        "active_model_path",
+        "models/isolation_forest_consumo.joblib",
+    )
+    metadata_path = config.resolve_model_lifecycle(
+        "metadata_path",
+        "models/isolation_forest_metadata.json",
+    )
     metadata: dict[str, Any] = {}
     if metadata_path.exists():
         try:
@@ -222,7 +230,7 @@ def _process_upload_event(event: dict[str, Any], config: Any, db: Any) -> dict[s
             "results": [],
         }
 
-    incoming = config.root / config.ingestion.get("incoming_dir", "data/incoming")
+    incoming = config.resolve_ingestion("incoming_dir", "data/incoming")
     incoming.mkdir(parents=True, exist_ok=True)
 
     started = time.perf_counter()
@@ -363,7 +371,7 @@ elif config is None or db is None:
     }
 
 component_value = dashboard_shell(
-    dashboard_html=_dashboard_html(),
+    dashboard_html=_dashboard_html(config),
     status=st.session_state.dashboard_shell_status,
     history=_history_status(config, db),
     ops=_ops_status(config, db),

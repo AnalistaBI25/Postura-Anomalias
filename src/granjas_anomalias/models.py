@@ -70,13 +70,17 @@ def _model_lifecycle(config: ProjectConfig) -> dict[str, Any]:
 
 
 def _active_model_path(config: ProjectConfig) -> Path:
-    lifecycle = _model_lifecycle(config)
-    return (config.root / lifecycle.get("active_model_path", "models/isolation_forest_consumo.joblib")).resolve()
+    return config.resolve_model_lifecycle(
+        "active_model_path",
+        "models/isolation_forest_consumo.joblib",
+    )
 
 
 def _active_metadata_path(config: ProjectConfig) -> Path:
-    lifecycle = _model_lifecycle(config)
-    return (config.root / lifecycle.get("metadata_path", "models/isolation_forest_metadata.json")).resolve()
+    return config.resolve_model_lifecycle(
+        "metadata_path",
+        "models/isolation_forest_metadata.json",
+    )
 
 
 def _hash_training_frame(frame: pd.DataFrame) -> str:

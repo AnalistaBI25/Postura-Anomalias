@@ -109,3 +109,18 @@ logs/**
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# Respaldo local previo a la migración multi-granja
+legacy/chencopo_pre_multigranja/
+legacy/tooling/
+
+# Runtime multi-granja: cada farm_id conserva artefactos locales independientes
+farms/*/data/**
+farms/*/models/**
+farms/*/outputs/**
+farms/*/logs/**
+farms/*/reports/**
+
+# El dashboard activo de Chencopo se conserva para el despliegue en modo consulta
+!farms/chencopo_2/reports/
+!farms/chencopo_2/reports/dashboard.html

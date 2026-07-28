@@ -25,6 +25,7 @@ def config(tmp_path: Path) -> ProjectConfig:
         root=tmp_path,
         raw={
             "project": {
+                "farm_id": "test-farm",
                 "center_id": "1217",
                 "farm_name": "GRANJA TEST",
                 "analysis_start": "2026-01-01",

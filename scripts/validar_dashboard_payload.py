@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -45,15 +46,19 @@ def load_csv(path: Path) -> pd.DataFrame:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Valida el payload de una granja.")
+    parser.add_argument(
+        "--config",
+        default=str(ROOT / "config" / "project.yml"),
+        help="Archivo YAML que contiene project.farm_id.",
+    )
+    args = parser.parse_args()
+
     print("=" * 70)
     print("VALIDACIÓN DEL PAYLOAD DEL DASHBOARD")
     print("=" * 70)
 
-    config_path = (
-        ROOT
-        / "config"
-        / "project.yml"
-    )
+    config_path = Path(args.config)
 
     if not config_path.exists():
         raise FileNotFoundError(
@@ -81,6 +86,8 @@ def main() -> None:
         f"Granja: "
         f"{config.project.get('farm_name', '-')}"
     )
+
+    print(f"farm_id: {config.farm_id}")
 
     print(
         f"Centro: "
@@ -382,11 +389,7 @@ def main() -> None:
         f"{first_period['regression_stats']}"
     )
 
-    debug_path = (
-        ROOT
-        / "reports"
-        / "dashboard_payload_debug.json"
-    )
+    debug_path = config.resolve("reports_dir") / "dashboard_payload_debug.json"
 
     debug_path.parent.mkdir(
         parents=True,

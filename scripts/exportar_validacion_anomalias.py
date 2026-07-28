@@ -21,14 +21,18 @@ ADVERTENCIA: el archivo contiene datos reales. No publicar (reports/ está en
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_INPUT = ROOT / "data" / "processed" / "10_features_y_scores_diarios.csv"
-DEFAULT_OUTPUT = ROOT / "reports" / "tables" / "validacion_top_anomalias_explicada.csv"
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from granjas_anomalias.config import load_config  # noqa: E402
 
 # Features interpretables para explicar la anomalía (con nombre amigable).
 EXPLAIN_FEATURES = {
@@ -160,8 +164,13 @@ def build_package(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Exporta paquete de validacion de anomalias")
-    parser.add_argument("--input", default=str(DEFAULT_INPUT))
-    parser.add_argument("--output", default=str(DEFAULT_OUTPUT))
+    parser.add_argument(
+        "--config",
+        default=str(ROOT / "config" / "project.yml"),
+        help="Archivo YAML que contiene project.farm_id.",
+    )
+    parser.add_argument("--input")
+    parser.add_argument("--output")
     parser.add_argument("--top", type=int, default=0, help="0 = todas las anomalias")
     parser.add_argument(
         "--solo-oficial",
@@ -170,7 +179,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    input_path = Path(args.input)
+    config = load_config(args.config)
+    input_path = (
+        Path(args.input)
+        if args.input
+        else config.resolve("processed_dir") / "10_features_y_scores_diarios.csv"
+    )
     if not input_path.exists():
         raise FileNotFoundError(
             f"No existe {input_path}. Ejecuta primero el pipeline de Fase 1."
@@ -186,7 +200,11 @@ def main() -> None:
         include_shadow=not args.solo_oficial,
     )
 
-    output_path = Path(args.output)
+    output_path = (
+        Path(args.output)
+        if args.output
+        else config.resolve("tables_dir") / "validacion_top_anomalias_explicada.csv"
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     package.to_csv(output_path, index=False, encoding="utf-8-sig")
 

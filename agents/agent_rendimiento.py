@@ -14,9 +14,9 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from .base import ROOT, BaseAgent
+from .base import ROOT, BaseAgent, farm_path
 
-LOG = ROOT / "logs" / "pipeline.log"
+LOG = farm_path("logs", "pipeline.log")
 
 
 def _kardex_sintetico(n: int) -> pd.DataFrame:

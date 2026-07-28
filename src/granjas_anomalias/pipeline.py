@@ -34,11 +34,11 @@ def _save(df: pd.DataFrame, directory: Path, name: str) -> Path:
 
 def run_pipeline(config_path: str | Path, model_mode: str | None = None) -> dict[str, Path]:
     config: ProjectConfig = load_config(config_path)
-    logger = configure_logging(config.resolve("logs_dir"))
+    logger = configure_logging(config.resolve("logs_dir"), config.farm_id)
     outputs: dict[str, Path] = {}
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    db = Warehouse(config.root / config.ingestion.get("db_path", "data/warehouse.db"))
+    db = Warehouse(config.resolve_ingestion("db_path", "data/warehouse.db"))
     db.iniciar_ejecucion(run_id, str(Path(config_path).resolve()), "fase1+alertas")
 
     logger.info("1/11 Cargando fuentes")
@@ -127,6 +127,7 @@ def run_pipeline(config_path: str | Path, model_mode: str | None = None) -> dict
     manifest = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "run_id": run_id,
+        "farm_id": config.farm_id,
         "config": str(Path(config_path).resolve()),
         "kardex_source": kardex_source,
         "rows": {
@@ -145,7 +146,7 @@ def run_pipeline(config_path: str | Path, model_mode: str | None = None) -> dict
             "artifact": str(model_path) if model_path is not None else "",
         },
     }
-    manifest_path = config.root / "reports" / "run_manifest.json"
+    manifest_path = config.resolve("reports_dir") / "run_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
     outputs["manifest"] = manifest_path
 

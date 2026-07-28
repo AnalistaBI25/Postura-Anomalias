@@ -255,11 +255,7 @@ def build_dashboard(
     )
 
     if output_path is None:
-        destination = (
-            config.root
-            / "reports"
-            / "dashboard.html"
-        )
+        destination = config.resolve("reports_dir") / "dashboard.html"
     else:
         destination = Path(
             output_path

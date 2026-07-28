@@ -4,10 +4,11 @@ import logging
 from pathlib import Path
 
 
-def configure_logging(log_dir: Path) -> logging.Logger:
+def configure_logging(log_dir: Path, farm_id: str) -> logging.Logger:
     log_dir.mkdir(parents=True, exist_ok=True)
-    logger = logging.getLogger("granjas_anomalias")
+    logger = logging.getLogger(f"granjas_anomalias.{farm_id}")
     logger.setLevel(logging.INFO)
+    logger.propagate = False
 
     if logger.handlers:
         return logger

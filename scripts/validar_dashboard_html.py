@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -43,15 +44,19 @@ def load_csv(path: Path) -> pd.DataFrame:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Valida el dashboard de una granja.")
+    parser.add_argument(
+        "--config",
+        default=str(ROOT / "config" / "project.yml"),
+        help="Archivo YAML que contiene project.farm_id.",
+    )
+    args = parser.parse_args()
+
     print("=" * 70)
     print("GENERACIÓN DE DASHBOARD HTML DE PRUEBA")
     print("=" * 70)
 
-    config_path = (
-        ROOT
-        / "config"
-        / "project.yml"
-    )
+    config_path = Path(args.config)
 
     config = load_config(
         config_path
@@ -97,11 +102,7 @@ def main() -> None:
         / "01_kardex_normalizado_clasificado.csv"
     )
 
-    output_path = (
-        ROOT
-        / "reports"
-        / "dashboard_prueba.html"
-    )
+    output_path = config.resolve("reports_dir") / "dashboard_prueba.html"
 
     print("\n2. Construyendo dashboard...")
 
@@ -178,8 +179,7 @@ def main() -> None:
 
     print(
         "\nÁbrelo con este comando:\n"
-        "Start-Process "
-        r".\reports\dashboard_prueba.html"
+        f'Start-Process "{generated_path}"'
     )
 
 

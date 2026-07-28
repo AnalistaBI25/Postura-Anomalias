@@ -1,5 +1,6 @@
 project:
   name: proyecto_bi_anomalias_chencopo
+  farm_id: chencopo_2
   center_id: "1217"
   farm_name: "CHENCOPO 2"
   timezone: "America/Merida"
@@ -18,6 +19,8 @@ paths:
   processed_dir: data/processed
   figures_dir: reports/figures
   tables_dir: reports/tables
+  reports_dir: reports
+  outputs_dir: outputs
   models_dir: models
   logs_dir: logs
 

@@ -9,6 +9,7 @@ Reglas de operación (Fase 1, solo lectura):
 from __future__ import annotations
 
 import json
+import sys
 import time
 import traceback
 from dataclasses import asdict, dataclass, field
@@ -17,8 +18,23 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from granjas_anomalias.config import ProjectConfig, load_config  # noqa: E402
+
+CONFIG_PATH = ROOT / "config" / "project.yml"
 
 SEVERIDADES = ("info", "low", "medium", "high", "critical")
+
+
+def active_config() -> ProjectConfig:
+    return load_config(CONFIG_PATH)
+
+
+def farm_path(*parts: str) -> Path:
+    return active_config().farm_root.joinpath(*parts)
 
 
 @dataclass

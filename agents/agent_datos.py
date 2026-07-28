@@ -6,11 +6,19 @@ import sqlite3
 
 import pandas as pd
 
-from .base import ROOT, BaseAgent
+from .base import ROOT, BaseAgent, farm_path
 
-KARDEX_CACHE = ROOT / "data" / "cache" / "kardex_mb51_chencopo_2024_2026.csv"
-WAREHOUSE = ROOT / "data" / "warehouse.db"
-NO_CLASIFICADOS = ROOT / "reports" / "tables" / "03_movimientos_no_clasificados.csv"
+KARDEX_CACHE = farm_path(
+    "data",
+    "cache",
+    "kardex_mb51_chencopo_2024_2026.csv",
+)
+WAREHOUSE = farm_path("data", "warehouse.db")
+NO_CLASIFICADOS = farm_path(
+    "reports",
+    "tables",
+    "03_movimientos_no_clasificados.csv",
+)
 
 LLAVES = ["Material", "Centro", "Almacén", "Clase de movimiento", "Fecha contabiliz."]
 
